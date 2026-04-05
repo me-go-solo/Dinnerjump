@@ -4,6 +4,9 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Thermometer } from '@/components/thermometer'
 import { CountdownTimer } from '@/components/countdown-timer'
+import { MatchingBoard } from '@/components/matching-board'
+import { generateMatch } from '@/actions/matching'
+import type { CourseType } from '@/lib/types'
 
 export default async function ManagePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -31,8 +34,93 @@ export default async function ManagePage({ params }: { params: Promise<{ slug: s
     ? `${process.env.NEXT_PUBLIC_APP_URL}/join/${event.invite_code}`
     : `${process.env.NEXT_PUBLIC_APP_URL}/events/${event.slug}`
 
+  // Load matching data when event is in a matchable status
+  const matchStatuses = ['confirmed', 'closed', 'active', 'completed']
+  const showMatching = matchStatuses.includes(event.status)
+
+  let matchVersions: Array<{
+    id: string
+    version: number
+    isActive: boolean
+    avgBikeMin: number | null
+    avgCarMin: number | null
+    tables: Array<{
+      id: string
+      course: CourseType
+      tableNumber: number
+      hostDuoId: string
+      hostName: string
+      hostCity: string
+      guests: Array<{ duoId: string; name: string; city: string }>
+    }>
+  }> = []
+
+  if (showMatching) {
+    const { data: matches } = await supabase
+      .from('matches')
+      .select('id, version, is_active, avg_travel_time_bike_min, avg_travel_time_car_min')
+      .eq('event_id', event.id)
+      .order('version', { ascending: true })
+
+    if (matches && matches.length > 0) {
+      // Build a duo lookup: duoId -> { name, city }
+      const duoMap = new Map(
+        (duos ?? []).map(d => [d.id, {
+          name: profileMap.get(d.person1_id) ?? 'Onbekend',
+          city: d.city ?? '',
+        }])
+      )
+
+      for (const match of matches) {
+        const { data: matchTables } = await supabase
+          .from('match_tables')
+          .select('id, course, table_number, host_duo_id')
+          .eq('match_id', match.id)
+          .order('table_number', { ascending: true })
+
+        const tablesWithGuests = []
+        for (const mt of matchTables ?? []) {
+          const { data: guests } = await supabase
+            .from('match_table_guests')
+            .select('duo_id')
+            .eq('match_table_id', mt.id)
+
+          const hostInfo = duoMap.get(mt.host_duo_id)
+          tablesWithGuests.push({
+            id: mt.id,
+            course: mt.course as CourseType,
+            tableNumber: mt.table_number,
+            hostDuoId: mt.host_duo_id,
+            hostName: hostInfo?.name ?? 'Onbekend',
+            hostCity: hostInfo?.city ?? '',
+            guests: (guests ?? []).map(g => {
+              const info = duoMap.get(g.duo_id)
+              return {
+                duoId: g.duo_id,
+                name: info?.name ?? 'Onbekend',
+                city: info?.city ?? '',
+              }
+            }),
+          })
+        }
+
+        matchVersions.push({
+          id: match.id,
+          version: match.version,
+          isActive: match.is_active,
+          avgBikeMin: match.avg_travel_time_bike_min,
+          avgCarMin: match.avg_travel_time_car_min,
+          tables: tablesWithGuests,
+        })
+      }
+    }
+  }
+
+  const hasMatch = matchVersions.length > 0
+  const showGenerateButton = event.status === 'confirmed' && !hasMatch
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="mb-2 text-2xl font-bold">{event.title}</h1>
       <p className="mb-6 text-sm text-gray-500">{new Date(event.event_date).toLocaleDateString()} — {event.start_time.slice(0, 5)}</p>
 
@@ -44,6 +132,24 @@ export default async function ManagePage({ params }: { params: Promise<{ slug: s
 
       <div className="mb-6"><Thermometer totalPaidDuos={totalPaid} confirmedDuos={confirmedCount} /></div>
       <CountdownTimer deadline={event.registration_deadline} />
+
+      {showGenerateButton && (
+        <form action={async () => {
+          'use server'
+          await generateMatch(event.id)
+        }}>
+          <button
+            type="submit"
+            className="mt-6 rounded bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+          >
+            Genereer indeling
+          </button>
+        </form>
+      )}
+
+      {hasMatch && (
+        <MatchingBoard eventId={event.id} versions={matchVersions} />
+      )}
 
       <div className="mt-8">
         <h2 className="mb-4 text-lg font-semibold">Duo&apos;s ({duos?.length ?? 0})</h2>
