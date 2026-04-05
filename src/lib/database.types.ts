@@ -27,6 +27,12 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['invitations']['Insert']>
         Relationships: [{ foreignKeyName: 'invitations_event_id_fkey'; columns: ['event_id']; isOneToOne: false; referencedRelation: 'events'; referencedColumns: ['id'] }]
       }
+      translation_cache: {
+        Row: { id: string; source_locale: string; target_locale: string; source_key: string; source_text: string; translated_text: string; created_at: string }
+        Insert: { id?: string; source_locale?: string; target_locale: string; source_key: string; source_text: string; translated_text: string }
+        Update: Partial<Database['public']['Tables']['translation_cache']['Insert']>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
