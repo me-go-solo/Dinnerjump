@@ -33,12 +33,46 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['translation_cache']['Insert']>
         Relationships: []
       }
+      matches: {
+        Row: { id: string; event_id: string; version: number; is_active: boolean; total_travel_time_bike_min: number | null; total_travel_time_car_min: number | null; avg_travel_time_bike_min: number | null; avg_travel_time_car_min: number | null; created_at: string }
+        Insert: { id?: string; event_id: string; version?: number; is_active?: boolean; total_travel_time_bike_min?: number | null; total_travel_time_car_min?: number | null; avg_travel_time_bike_min?: number | null; avg_travel_time_car_min?: number | null }
+        Update: Partial<Database['public']['Tables']['matches']['Insert']>
+        Relationships: [{ foreignKeyName: 'matches_event_id_fkey'; columns: ['event_id']; isOneToOne: false; referencedRelation: 'events'; referencedColumns: ['id'] }]
+      }
+      match_assignments: {
+        Row: { id: string; match_id: string; duo_id: string; hosted_course: 'appetizer' | 'main' | 'dessert'; duo_display_name: string }
+        Insert: { id?: string; match_id: string; duo_id: string; hosted_course: 'appetizer' | 'main' | 'dessert'; duo_display_name: string }
+        Update: Partial<Database['public']['Tables']['match_assignments']['Insert']>
+        Relationships: [{ foreignKeyName: 'match_assignments_match_id_fkey'; columns: ['match_id']; isOneToOne: false; referencedRelation: 'matches'; referencedColumns: ['id'] }]
+      }
+      match_tables: {
+        Row: { id: string; match_id: string; course: 'appetizer' | 'main' | 'dessert'; table_number: number; host_duo_id: string }
+        Insert: { id?: string; match_id: string; course: 'appetizer' | 'main' | 'dessert'; table_number: number; host_duo_id: string }
+        Update: Partial<Database['public']['Tables']['match_tables']['Insert']>
+        Relationships: [{ foreignKeyName: 'match_tables_match_id_fkey'; columns: ['match_id']; isOneToOne: false; referencedRelation: 'matches'; referencedColumns: ['id'] }]
+      }
+      match_table_guests: {
+        Row: { id: string; match_table_id: string; duo_id: string }
+        Insert: { id?: string; match_table_id: string; duo_id: string }
+        Update: Partial<Database['public']['Tables']['match_table_guests']['Insert']>
+        Relationships: [{ foreignKeyName: 'match_table_guests_match_table_id_fkey'; columns: ['match_table_id']; isOneToOne: false; referencedRelation: 'match_tables'; referencedColumns: ['id'] }]
+      }
+      route_cache: {
+        Row: { id: string; origin_lat: number; origin_lng: number; dest_lat: number; dest_lng: number; mode: string; duration_minutes: number; distance_km: number; fetched_at: string }
+        Insert: { id?: string; origin_lat: number; origin_lng: number; dest_lat: number; dest_lng: number; mode: string; duration_minutes: number; distance_km: number }
+        Update: Partial<Database['public']['Tables']['route_cache']['Insert']>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
       process_duo_registration: {
         Args: { p_duo_id: string }
         Returns: { action: string; total_paid: number; duos_needed: number }
+      }
+      set_active_match: {
+        Args: { p_match_id: string }
+        Returns: undefined
       }
     }
     Enums: {
@@ -47,6 +81,7 @@ export interface Database {
       duo_status: 'pending_payment' | 'registered' | 'waitlisted' | 'confirmed' | 'cancelled'
       invitation_policy: 'organizer_only' | 'participants_allowed'
       invitation_status: 'sent' | 'opened' | 'registered'
+      course_type: 'appetizer' | 'main' | 'dessert'
     }
   }
 }
