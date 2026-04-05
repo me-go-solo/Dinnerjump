@@ -13,14 +13,26 @@ const defaultIcon = L.icon({
   iconAnchor: [12, 41],
 })
 
+// Default center: Netherlands
+const DEFAULT_LAT = 52.1326
+const DEFAULT_LNG = 5.2913
+const DEFAULT_ZOOM = 7
+
 function MapUpdater({ lat, lng, radiusKm }: { lat: number; lng: number; radiusKm: number }) {
   const map = useMap()
+  const prevRef = useRef({ lat: 0, lng: 0, radiusKm: 0 })
+
   useEffect(() => {
+    const prev = prevRef.current
+    if (lat === prev.lat && lng === prev.lng && radiusKm === prev.radiusKm) return
+    prevRef.current = { lat, lng, radiusKm }
+
     if (lat !== 0 && lng !== 0) {
       const bounds = L.latLng(lat, lng).toBounds(radiusKm * 2000)
-      map.fitBounds(bounds, { padding: [20, 20] })
+      map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 })
     }
   }, [lat, lng, radiusKm, map])
+
   return null
 }
 
@@ -53,13 +65,25 @@ type Props = {
 }
 
 export function LocationMap({ lat, lng, radiusKm, onPositionChange }: Props) {
-  if (lat === 0 && lng === 0) return null
+  const hasLocation = lat !== 0 && lng !== 0
+  const centerLat = hasLocation ? lat : DEFAULT_LAT
+  const centerLng = hasLocation ? lng : DEFAULT_LNG
+  const zoom = hasLocation ? 13 : DEFAULT_ZOOM
+
   return (
-    <div className="mt-3 overflow-hidden rounded-lg border" style={{ height: '300px' }}>
-      <MapContainer center={[lat, lng]} zoom={13} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
+    <div className="overflow-hidden rounded-lg border" style={{ height: '350px' }}>
+      <MapContainer center={[centerLat, centerLng]} zoom={zoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
         <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <DraggableMarker lat={lat} lng={lng} onPositionChange={onPositionChange} />
-        <Circle center={[lat, lng]} radius={radiusKm * 1000} pathOptions={{ color: '#000', fillColor: '#000', fillOpacity: 0.08, weight: 2, dashArray: '5, 10' }} />
+        {hasLocation && (
+          <>
+            <DraggableMarker lat={lat} lng={lng} onPositionChange={onPositionChange} />
+            <Circle
+              center={[lat, lng]}
+              radius={radiusKm * 1000}
+              pathOptions={{ color: '#000', fillColor: '#000', fillOpacity: 0.08, weight: 2, dashArray: '5, 10' }}
+            />
+          </>
+        )}
         <MapUpdater lat={lat} lng={lng} radiusKm={radiusKm} />
       </MapContainer>
     </div>
