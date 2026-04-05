@@ -14,7 +14,14 @@ export function StepBasics({ data, onChange }: Props) {
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium">{t('eventDescription')}</label>
-        <textarea value={data.description} onChange={(e) => onChange({ description: e.target.value })} className="w-full rounded border px-3 py-2" rows={3} />
+        <textarea
+          value={data.description}
+          onChange={(e) => onChange({ description: e.target.value })}
+          className="w-full rounded border px-3 py-2"
+          rows={3}
+          placeholder={t('descriptionPlaceholder')}
+        />
+        <p className="mt-1 text-xs text-gray-400">{t('descriptionHelp')}</p>
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium">{t('eventType')}</label>

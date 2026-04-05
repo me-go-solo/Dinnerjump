@@ -7,15 +7,20 @@ type Props = { data: WizardData; onChange: (partial: Partial<WizardData>) => voi
 export function StepOptions({ data, onChange }: Props) {
   const t = useTranslations('wizard')
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <div>
         <label className="mb-1 block text-sm font-medium">{t('afterpartyAddress')}</label>
         <input type="text" value={data.afterpartyAddress} onChange={(e) => onChange({ afterpartyAddress: e.target.value })} className="w-full rounded border px-3 py-2" />
+        <p className="mt-1 text-xs text-gray-400">{t('afterpartyHelp')}</p>
       </div>
-      <label className="flex items-center gap-2">
-        <input type="checkbox" checked={data.welcomeCardEnabled} onChange={(e) => onChange({ welcomeCardEnabled: e.target.checked })} />
-        {t('welcomeCard')}
-      </label>
+      <div className="opacity-50">
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={false} disabled />
+          {t('welcomeCard')}
+          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{t('welcomeCardComingSoon')}</span>
+        </label>
+        <p className="mt-1 text-xs text-gray-400">{t('welcomeCardHelp')}</p>
+      </div>
     </div>
   )
 }
