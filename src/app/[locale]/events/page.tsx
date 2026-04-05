@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { EventCard } from '@/components/event-card'
