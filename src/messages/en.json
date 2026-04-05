@@ -1,0 +1,104 @@
+{
+  "common": {
+    "appName": "Dinner Jump",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit",
+    "loading": "Loading...",
+    "error": "Something went wrong"
+  },
+  "nav": {
+    "home": "Home",
+    "events": "Discover events",
+    "organize": "Organize",
+    "dashboard": "Dashboard",
+    "about": "About",
+    "faq": "FAQ"
+  },
+  "landing": {
+    "hero": "Jump from table to table",
+    "subtitle": "A rotating dinner event where you visit 3 homes and enjoy a different course with new tablemates at each stop.",
+    "ctaJoin": "Join an event",
+    "ctaOrganize": "Organize a Dinner Jump"
+  },
+  "events": {
+    "discover": "Discover events",
+    "byInvitation": "By invitation",
+    "duos": "duos",
+    "duosConfirmed": "{count} duos confirmed",
+    "duosNeeded": "{count} more duo needed",
+    "registerButton": "Sign up",
+    "registrationClosed": "Registration closed",
+    "deadline": "Deadline",
+    "travelTime": "{minutes} min travel time",
+    "startTime": "Starts at {time}"
+  },
+  "wizard": {
+    "title": "Organize a Dinner Jump",
+    "stepBasics": "Basics",
+    "stepDateTime": "Date & time",
+    "stepLocation": "Location",
+    "stepPolicy": "Invitation policy",
+    "stepOptions": "Options",
+    "stepReview": "Review",
+    "eventName": "Event name",
+    "eventDescription": "Description (optional)",
+    "eventType": "Event type",
+    "typeOpen": "Open — visible to everyone",
+    "typeClosed": "Closed — by invitation only",
+    "eventDate": "Date",
+    "startTime": "Start time",
+    "travelTime": "Travel time between courses",
+    "centerAddress": "Center point (address)",
+    "radius": "Radius",
+    "policyTitle": "Who can invite?",
+    "policyOrganizerOnly": "Only me",
+    "policyParticipantsAllowed": "Participants can also invite (max 5 per duo)",
+    "afterpartyAddress": "Afterparty address (optional)",
+    "welcomeCard": "Send physical welcome card",
+    "publish": "Publish event"
+  },
+  "registration": {
+    "title": "Sign up",
+    "partnerName": "Duo partner name",
+    "partnerEmail": "Duo partner email",
+    "address": "Address",
+    "city": "City",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "outsideRadius": "Your address is outside this event's zone.",
+    "pay": "Pay €10 and sign up",
+    "confirmed": "Your spot is confirmed!",
+    "waitlisted": "You're on the waitlist. {count} more duo needed.",
+    "registered": "You're signed up! Waiting for the minimum of 9 duos."
+  },
+  "invitations": {
+    "title": "Invite someone",
+    "subtitle": "Know someone who would enjoy Dinner Jump? Invite them personally.",
+    "name": "Name",
+    "email": "Email",
+    "message": "Personal message (optional)",
+    "send": "Send invitation",
+    "sent": "Invitation sent!",
+    "remaining": "{count} invitations remaining",
+    "limitReached": "You've used all 5 invitations"
+  },
+  "dashboard": {
+    "title": "My events",
+    "asParticipant": "As participant",
+    "asOrganizer": "As organizer",
+    "noEvents": "You're not participating in any events yet.",
+    "createFirst": "Organize your first Dinner Jump"
+  },
+  "thermometer": {
+    "minimum": "Minimum: 9 duos",
+    "confirmed": "Event confirmed!",
+    "waitingForMinimum": "Waiting for minimum — {count} more duos needed",
+    "nextTable": "Next table — {count} more duo needed"
+  }
+}

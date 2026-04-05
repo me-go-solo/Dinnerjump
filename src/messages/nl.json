@@ -1,0 +1,104 @@
+{
+  "common": {
+    "appName": "Dinner Jump",
+    "login": "Inloggen",
+    "register": "Registreren",
+    "logout": "Uitloggen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "next": "Volgende",
+    "back": "Terug",
+    "submit": "Versturen",
+    "loading": "Laden...",
+    "error": "Er is iets misgegaan"
+  },
+  "nav": {
+    "home": "Home",
+    "events": "Ontdek events",
+    "organize": "Organiseer",
+    "dashboard": "Dashboard",
+    "about": "Over ons",
+    "faq": "FAQ"
+  },
+  "landing": {
+    "hero": "Spring van tafel naar tafel",
+    "subtitle": "Een roulerend diner-event waar je 3 adressen afgaat en bij elk adres een gang geniet met steeds nieuwe tafelgenoten.",
+    "ctaJoin": "Doe mee",
+    "ctaOrganize": "Organiseer een Dinner Jump"
+  },
+  "events": {
+    "discover": "Ontdek events",
+    "byInvitation": "Op uitnodiging",
+    "duos": "duo's",
+    "duosConfirmed": "{count} duo's bevestigd",
+    "duosNeeded": "Nog {count} duo nodig",
+    "registerButton": "Schrijf je in",
+    "registrationClosed": "Inschrijving gesloten",
+    "deadline": "Deadline",
+    "travelTime": "{minutes} min reistijd",
+    "startTime": "Start om {time}"
+  },
+  "wizard": {
+    "title": "Organiseer een Dinner Jump",
+    "stepBasics": "Basisgegevens",
+    "stepDateTime": "Datum & tijd",
+    "stepLocation": "Locatie",
+    "stepPolicy": "Uitnodigingsbeleid",
+    "stepOptions": "Opties",
+    "stepReview": "Overzicht",
+    "eventName": "Naam van het event",
+    "eventDescription": "Beschrijving (optioneel)",
+    "eventType": "Type event",
+    "typeOpen": "Open — zichtbaar voor iedereen",
+    "typeClosed": "Gesloten — alleen op uitnodiging",
+    "eventDate": "Datum",
+    "startTime": "Starttijd",
+    "travelTime": "Reistijd tussen gangen",
+    "centerAddress": "Centrumpunt (adres)",
+    "radius": "Radius",
+    "policyTitle": "Wie mag uitnodigen?",
+    "policyOrganizerOnly": "Alleen ik",
+    "policyParticipantsAllowed": "Deelnemers mogen ook uitnodigen (max 5 per duo)",
+    "afterpartyAddress": "Afterparty-adres (optioneel)",
+    "welcomeCard": "Fysieke welkomstkaart versturen",
+    "publish": "Publiceer event"
+  },
+  "registration": {
+    "title": "Inschrijven",
+    "partnerName": "Naam duo-partner",
+    "partnerEmail": "E-mail duo-partner",
+    "address": "Adres",
+    "city": "Stad",
+    "postalCode": "Postcode",
+    "country": "Land",
+    "outsideRadius": "Je adres valt buiten de zone van dit event.",
+    "pay": "Betaal €10 en schrijf in",
+    "confirmed": "Je plek is bevestigd!",
+    "waitlisted": "Je staat op de wachtlijst. Nog {count} duo nodig.",
+    "registered": "Je bent ingeschreven! We wachten op het minimum van 9 duo's."
+  },
+  "invitations": {
+    "title": "Nodig iemand uit",
+    "subtitle": "Ken je iemand die Dinner Jump zou waarderen? Nodig ze persoonlijk uit.",
+    "name": "Naam",
+    "email": "E-mail",
+    "message": "Persoonlijk berichtje (optioneel)",
+    "send": "Verstuur uitnodiging",
+    "sent": "Uitnodiging verstuurd!",
+    "remaining": "Nog {count} uitnodigingen over",
+    "limitReached": "Je hebt alle 5 uitnodigingen verstuurd"
+  },
+  "dashboard": {
+    "title": "Mijn events",
+    "asParticipant": "Als deelnemer",
+    "asOrganizer": "Als organisator",
+    "noEvents": "Je doet nog niet mee aan een event.",
+    "createFirst": "Organiseer je eerste Dinner Jump"
+  },
+  "thermometer": {
+    "minimum": "Minimum: 9 duo's",
+    "confirmed": "Event bevestigd!",
+    "waitingForMinimum": "Wacht op minimum — nog {count} duo's nodig",
+    "nextTable": "Volgende tafel — nog {count} duo nodig"
+  }
+}
