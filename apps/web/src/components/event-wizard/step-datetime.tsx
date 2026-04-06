@@ -32,7 +32,7 @@ export function StepDateTime({ data, onChange }: Props) {
           <select
             value={currentHour}
             onChange={(e) => handleHourChange(Number(e.target.value))}
-            className="w-24 rounded border px-3 py-2"
+            className="flex-1 rounded border px-3 py-2"
           >
             {HOURS.map((h) => (
               <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
@@ -42,7 +42,7 @@ export function StepDateTime({ data, onChange }: Props) {
           <select
             value={currentMinute}
             onChange={(e) => handleMinuteChange(Number(e.target.value))}
-            className="w-24 rounded border px-3 py-2"
+            className="flex-1 rounded border px-3 py-2"
           >
             {MINUTES.map((m) => (
               <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
