@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from '@/i18n/navigation'
-import { mixMatch, setActiveMatchVersion } from '@/actions/matching'
+import { mixMatch, setActiveMatchVersion, saveMatchOverride } from '@/actions/matching'
+import { validateTableData } from '@/lib/matching'
 import type { CourseType } from '@/lib/types'
 
 type TableData = {
@@ -47,6 +48,9 @@ export function MatchingBoard({ eventId, versions }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [transportMode, setTransportMode] = useState<'bike' | 'car'>('bike')
+  const [isDirty, setIsDirty] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const activeVersion = versions.find(v => v.isActive) ?? versions[versions.length - 1]
   if (!activeVersion) return null
@@ -64,6 +68,9 @@ export function MatchingBoard({ eventId, versions }: Props) {
   if (activeVersion.id !== lastVersionId) {
     setTables(activeVersion.tables)
     setLastVersionId(activeVersion.id)
+    setIsDirty(false)
+    setValidationErrors([])
+    setSaveError(null)
   }
 
   const avgTime = transportMode === 'bike' ? activeVersion.avgBikeMin : activeVersion.avgCarMin
@@ -90,6 +97,20 @@ export function MatchingBoard({ eventId, versions }: Props) {
     startTransition(async () => {
       await setActiveMatchVersion(eventId, next.version)
       router.refresh()
+    })
+  }
+
+  function handleSave() {
+    startTransition(async () => {
+      setSaveError(null)
+      const result = await saveMatchOverride(eventId, tables)
+      if (result.error) {
+        setSaveError(result.error)
+      } else {
+        setIsDirty(false)
+        setValidationErrors([])
+        router.refresh()
+      }
     })
   }
 
@@ -132,6 +153,9 @@ export function MatchingBoard({ eventId, versions }: Props) {
 
     setTables(newTables)
     setDragSource(null)
+    setIsDirty(true)
+    const result = validateTableData(newTables)
+    setValidationErrors(result.errors)
   }
 
   return (
@@ -226,6 +250,33 @@ export function MatchingBoard({ eventId, versions }: Props) {
           )
         })}
       </div>
+
+      {validationErrors.length > 0 && (
+        <div className="mt-4 rounded border border-yellow-300 bg-yellow-50 p-4">
+          <p className="mb-2 text-sm font-semibold text-yellow-800">⚠️ Validatie-waarschuwingen</p>
+          <ul className="list-inside list-disc text-sm text-yellow-700">
+            {validationErrors.map((err, i) => (
+              <li key={i}>{err}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="mt-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+          {saveError}
+        </div>
+      )}
+
+      {isDirty && (
+        <button
+          onClick={handleSave}
+          disabled={validationErrors.length > 0 || isPending}
+          className="mt-4 rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? 'Opslaan...' : '💾 Wijzigingen opslaan'}
+        </button>
+      )}
     </div>
   )
 }
