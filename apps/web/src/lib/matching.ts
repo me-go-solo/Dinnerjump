@@ -177,6 +177,55 @@ export function generateOptimalMatch(
   return { assignments: bestAssignments, tables: bestTables }
 }
 
+type TableDataForValidation = {
+  id: string
+  course: string
+  tableNumber: number
+  hostDuoId: string
+  hostName: string
+  hostCity: string
+  guests: Array<{ duoId: string; name: string; city: string }>
+}
+
+export function validateTableData(tables: TableDataForValidation[]): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+
+  for (const table of tables) {
+    const totalDuos = 1 + table.guests.length
+    if (totalDuos !== 3) {
+      errors.push(`Tafel ${table.tableNumber} (${table.course}) heeft ${totalDuos} duo's — moet er 3 hebben`)
+    }
+  }
+
+  const pairsSeen = new Map<string, string>()
+
+  for (const table of tables) {
+    const allDuoIds = [table.hostDuoId, ...table.guests.map(g => g.duoId)]
+
+    for (let i = 0; i < allDuoIds.length; i++) {
+      for (let j = i + 1; j < allDuoIds.length; j++) {
+        const pair = [allDuoIds[i], allDuoIds[j]].sort().join('-')
+        if (pairsSeen.has(pair)) {
+          const prevCourse = pairsSeen.get(pair)!
+          const findName = (id: string): string => {
+            for (const t of tables) {
+              if (t.hostDuoId === id) return t.hostName
+              const guest = t.guests.find(g => g.duoId === id)
+              if (guest) return guest.name
+            }
+            return id
+          }
+          errors.push(`${findName(allDuoIds[i])} & ${findName(allDuoIds[j])} zitten samen bij zowel ${prevCourse} als ${table.course}`)
+        } else {
+          pairsSeen.set(pair, table.course)
+        }
+      }
+    }
+  }
+
+  return { valid: errors.length === 0, errors }
+}
+
 export function assignCoursesFromResult(duos: DuoForMatching[], result: MatchResult): CourseGroups {
   const groups: CourseGroups = { appetizer: [], main: [], dessert: [] }
   for (const duo of duos) {
