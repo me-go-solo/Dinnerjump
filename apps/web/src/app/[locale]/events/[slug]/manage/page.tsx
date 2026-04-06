@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Thermometer } from '@/components/thermometer'
 import { CountdownTimer } from '@/components/countdown-timer'
 import { MatchingBoard } from '@/components/matching-board'
-import { generateMatch } from '@/actions/matching'
+import { generateMatch, approveMatching } from '@/actions/matching'
 import type { CourseType } from '@/lib/types'
 
 export default async function ManagePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -118,6 +118,7 @@ export default async function ManagePage({ params }: { params: Promise<{ slug: s
 
   const hasMatch = matchVersions.length > 0
   const showGenerateButton = event.status === 'confirmed' && !hasMatch
+  const showApproveButton = event.status === 'closed' && hasMatch
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -143,6 +144,20 @@ export default async function ManagePage({ params }: { params: Promise<{ slug: s
             className="mt-6 rounded bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
           >
             Genereer indeling
+          </button>
+        </form>
+      )}
+
+      {showApproveButton && (
+        <form action={async () => {
+          'use server'
+          await approveMatching(event.id)
+        }}>
+          <button
+            type="submit"
+            className="mt-6 rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
+          >
+            Matching goedkeuren & onthullingen starten
           </button>
         </form>
       )}

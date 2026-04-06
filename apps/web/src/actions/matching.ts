@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generateOptimalMatch } from '@/lib/matching'
 import { calculateDistance } from '@/lib/geo'
+import { calculateRevealSchedule } from '@dinnerjump/shared'
 import type { DuoForMatching, CourseType } from '@/lib/types'
 
 export async function generateMatch(eventId: string) {
@@ -122,6 +123,61 @@ export async function generateMatch(eventId: string) {
 
 export async function mixMatch(eventId: string) {
   return generateMatch(eventId)
+}
+
+export async function approveMatching(eventId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: event } = await supabase
+    .from('events')
+    .select('id, organizer_id, status, event_date, start_time, appetizer_duration, main_duration, dessert_duration, timezone, travel_time_minutes, afterparty_address')
+    .eq('id', eventId)
+    .single()
+
+  if (!event || event.organizer_id !== user.id) return { error: 'Not authorized' }
+  if (event.status !== 'closed') return { error: 'Event must be in closed status' }
+
+  // Check active match exists
+  const { data: activeMatch } = await supabase
+    .from('matches')
+    .select('id')
+    .eq('event_id', eventId)
+    .eq('is_active', true)
+    .single()
+
+  if (!activeMatch) return { error: 'No active match found' }
+
+  // Calculate reveal schedule
+  const schedule = calculateRevealSchedule({
+    eventDate: event.event_date,
+    startTime: event.start_time.slice(0, 5),
+    timezone: event.timezone,
+    appetizerDuration: event.appetizer_duration,
+    mainDuration: event.main_duration,
+    dessertDuration: event.dessert_duration,
+    travelTimeMinutes: event.travel_time_minutes,
+    hasAfterparty: !!event.afterparty_address,
+  })
+
+  const admin = createAdminClient()
+
+  // Insert reveals
+  const { error: revealError } = await admin.from('reveals').insert(
+    schedule.map(r => ({
+      event_id: eventId,
+      reveal_type: r.revealType,
+      scheduled_at: r.scheduledAt,
+    }))
+  )
+
+  if (revealError) return { error: 'Failed to create reveals' }
+
+  // Update event status to active
+  await admin.from('events').update({ status: 'active' }).eq('id', eventId)
+
+  return { success: true }
 }
 
 export async function setActiveMatchVersion(eventId: string, version: number) {
