@@ -63,6 +63,12 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['reveals']['Insert']>
         Relationships: [{ foreignKeyName: 'reveals_event_id_fkey'; columns: ['event_id']; isOneToOne: false; referencedRelation: 'events'; referencedColumns: ['id'] }]
       }
+      push_tokens: {
+        Row: { id: string; profile_id: string; token: string; created_at: string }
+        Insert: { id?: string; profile_id: string; token: string }
+        Update: Partial<Database['public']['Tables']['push_tokens']['Insert']>
+        Relationships: [{ foreignKeyName: 'push_tokens_profile_id_fkey'; columns: ['profile_id']; isOneToOne: false; referencedRelation: 'profiles'; referencedColumns: ['id'] }]
+      }
       route_cache: {
         Row: { id: string; origin_lat: number; origin_lng: number; dest_lat: number; dest_lng: number; mode: string; duration_minutes: number; distance_km: number; fetched_at: string }
         Insert: { id?: string; origin_lat: number; origin_lng: number; dest_lat: number; dest_lng: number; mode: string; duration_minutes: number; distance_km: number }
