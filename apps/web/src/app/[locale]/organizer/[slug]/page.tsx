@@ -4,6 +4,9 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Link } from '@/i18n/navigation'
 import { EventHeader } from '@/components/organizer/event-header'
+import { RegistrationThermometer } from '@/components/organizer/registration-thermometer'
+import { InvitationsBlock } from '@/components/organizer/invitations-block'
+import { MessagingBlock } from '@/components/organizer/messaging-block'
 import { ChevronLeft } from 'lucide-react'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -41,7 +44,15 @@ export default async function EventDetailPage({ params }: Props) {
 
       <EventHeader event={event} confirmedCount={confirmedCount ?? 0} />
 
-      {/* More blocks will be added in subsequent tasks */}
+      <RegistrationThermometer confirmedCount={confirmedCount ?? 0} />
+
+      <InvitationsBlock
+        eventId={event.id}
+        eventSlug={event.slug}
+        appUrl={process.env.NEXT_PUBLIC_APP_URL ?? ''}
+      />
+
+      <MessagingBlock eventId={event.id} />
     </div>
   )
 }
