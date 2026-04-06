@@ -1,20 +1,13 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { GoogleMapView } from './google-map'
 import type { WizardData } from './wizard'
-
-const LocationMap = dynamic(() => import('./location-map').then(mod => ({ default: mod.LocationMap })), {
-  ssr: false,
-  loading: () => <div className="h-[350px] rounded-lg border bg-gray-50 flex items-center justify-center text-sm text-gray-400">Kaart laden...</div>,
-})
 
 type Props = { data: WizardData; onChange: (partial: Partial<WizardData>) => void }
 
 export function StepLocation({ data, onChange }: Props) {
   const t = useTranslations('wizard')
-  const [searching, setSearching] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'done' | 'denied'>('idle')
 
   // Auto-detect location on mount if no location set yet
@@ -41,8 +34,6 @@ export function StepLocation({ data, onChange }: Props) {
         setGeoStatus('done')
       },
       () => {
-        // Permission denied or error — show fallback (Netherlands center)
-        onChange({ centerLat: 52.1326, centerLng: 5.2913 })
         setGeoStatus('denied')
       },
       { enableHighAccuracy: true, timeout: 8000 }
@@ -50,22 +41,7 @@ export function StepLocation({ data, onChange }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function handleSearch() {
-    if (!data.centerAddress) return
-    setSearching(true)
-    setError(null)
-    const res = await fetch(`/api/geocode?address=${encodeURIComponent(data.centerAddress)}`)
-    if (!res.ok) { setError('Adres niet gevonden'); setSearching(false); return }
-    const geo = await res.json()
-    onChange({ centerLat: geo.lat, centerLng: geo.lng, centerAddress: geo.displayName })
-    setSearching(false)
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') { e.preventDefault(); handleSearch() }
-  }
-
-  const handlePositionChange = useCallback(async (lat: number, lng: number) => {
+  const handleCenterChange = useCallback(async (lat: number, lng: number) => {
     onChange({ centerLat: lat, centerLng: lng })
     // Reverse geocode the new position
     try {
@@ -80,38 +56,25 @@ export function StepLocation({ data, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search bar above map */}
-      <div className="relative">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={data.centerAddress}
-            onChange={(e) => onChange({ centerAddress: e.target.value })}
-            onKeyDown={handleKeyDown}
-            className="flex-1 rounded border px-3 py-2 text-sm"
-            placeholder="Zoek een adres of plaats..."
-          />
-          <button
-            type="button"
-            onClick={handleSearch}
-            disabled={searching}
-            className="rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
-          >
-            {searching ? '...' : 'Zoek'}
-          </button>
-        </div>
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {geoStatus === 'loading' && <p className="mt-1 text-xs text-gray-400">Locatie bepalen...</p>}
-        {geoStatus === 'denied' && <p className="mt-1 text-xs text-yellow-600">Locatietoegang geweigerd. Zoek een adres of versleep de marker op de kaart.</p>}
-      </div>
+      {geoStatus === 'loading' && <p className="text-xs text-gray-400">Locatie bepalen...</p>}
+      {geoStatus === 'denied' && (
+        <p className="rounded border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-700">
+          Sta locatietoegang toe in je browser om je positie te bepalen
+        </p>
+      )}
 
-      {/* Map — always visible */}
-      <LocationMap
-        lat={data.centerLat}
-        lng={data.centerLng}
-        radiusKm={data.radiusKm}
-        onPositionChange={handlePositionChange}
-      />
+      {/* Map — always visible when we have a location */}
+      {(data.centerLat !== 0 && data.centerLng !== 0) ? (
+        <GoogleMapView
+          center={{ lat: data.centerLat, lng: data.centerLng }}
+          radius={data.radiusKm * 1000}
+          onCenterChange={handleCenterChange}
+        />
+      ) : geoStatus !== 'loading' && (
+        <div className="flex h-[350px] items-center justify-center rounded-lg border bg-gray-50 text-sm text-gray-400">
+          Sta locatietoegang toe om de kaart te laden
+        </div>
+      )}
 
       {/* Radius slider */}
       <div>
