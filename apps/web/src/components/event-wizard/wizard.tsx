@@ -7,6 +7,7 @@ import { createEvent } from '@/actions/events'
 import { StepBasics } from './step-basics'
 import { StepDateTime } from './step-datetime'
 import { StepLocation } from './step-location'
+import { StepDurations } from './step-durations'
 import { StepPolicy } from './step-policy'
 import { StepOptions } from './step-options'
 import { StepReview } from './step-review'
@@ -28,6 +29,10 @@ export type WizardData = {
   afterpartyLat?: number
   afterpartyLng?: number
   welcomeCardEnabled: boolean
+  appetizerDuration: number
+  mainDuration: number
+  dessertDuration: number
+  timezone: string
 }
 
 const INITIAL_DATA: WizardData = {
@@ -36,9 +41,11 @@ const INITIAL_DATA: WizardData = {
   centerAddress: '', centerLat: 0, centerLng: 0, radiusKm: 2,
   invitationPolicy: 'organizer_only',
   afterpartyName: '', afterpartyAddress: '', welcomeCardEnabled: false,
+  appetizerDuration: 90, mainDuration: 120, dessertDuration: 60,
+  timezone: 'Europe/Amsterdam',
 }
 
-const STEPS = ['basics', 'datetime', 'location', 'policy', 'options', 'review'] as const
+const STEPS = ['basics', 'datetime', 'location', 'durations', 'policy', 'options', 'review'] as const
 
 export function EventWizard() {
   const t = useTranslations('wizard')
@@ -64,6 +71,7 @@ export function EventWizard() {
     <StepBasics key="basics" data={data} onChange={updateData} />,
     <StepDateTime key="datetime" data={data} onChange={updateData} />,
     <StepLocation key="location" data={data} onChange={updateData} />,
+    <StepDurations key="durations" data={data} onChange={updateData} />,
     <StepPolicy key="policy" data={data} onChange={updateData} />,
     <StepOptions key="options" data={data} onChange={updateData} />,
     <StepReview key="review" data={data} onPublish={handlePublish} submitting={submitting} error={error} />,

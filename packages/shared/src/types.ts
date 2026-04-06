@@ -1,4 +1,5 @@
-export type { RevealType } from './constants'
+import type { RevealType } from './constants'
+export type { RevealType }
 
 export type CourseType = 'appetizer' | 'main' | 'dessert'
 

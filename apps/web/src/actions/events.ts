@@ -21,6 +21,10 @@ type CreateEventInput = {
   afterpartyLat?: number
   afterpartyLng?: number
   welcomeCardEnabled: boolean
+  appetizerDuration: number
+  mainDuration: number
+  dessertDuration: number
+  timezone: string
 }
 
 export async function createEvent(input: CreateEventInput) {
@@ -59,6 +63,10 @@ export async function createEvent(input: CreateEventInput) {
       afterparty_lat: input.afterpartyLat || null,
       afterparty_lng: input.afterpartyLng || null,
       welcome_card_enabled: input.welcomeCardEnabled,
+      appetizer_duration: input.appetizerDuration,
+      main_duration: input.mainDuration,
+      dessert_duration: input.dessertDuration,
+      timezone: input.timezone,
       registration_deadline: deadline.toISOString(),
     })
     .select()
