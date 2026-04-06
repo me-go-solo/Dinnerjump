@@ -53,8 +53,57 @@ export function EventWizard() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  const [validationError, setValidationError] = useState<string | null>(null)
+
   function updateData(partial: Partial<WizardData>) {
     setData((prev) => ({ ...prev, ...partial }))
+    setValidationError(null)
+  }
+
+  function validateStep(): boolean {
+    switch (step) {
+      case 0:
+        if (!data.title.trim()) {
+          setValidationError('Vul een titel in voor je evenement.')
+          return false
+        }
+        break
+      case 1: {
+        if (!data.eventDate) {
+          setValidationError('Kies een datum voor je evenement.')
+          return false
+        }
+        const selected = new Date(data.eventDate + 'T00:00:00')
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        if (selected <= today) {
+          setValidationError('De datum moet in de toekomst liggen.')
+          return false
+        }
+        break
+      }
+      case 2:
+        if (!data.centerLat || !data.centerLng || (data.centerLat === 0 && data.centerLng === 0)) {
+          setValidationError('Kies een locatie op de kaart.')
+          return false
+        }
+        break
+      case 3:
+        if (data.appetizerDuration <= 0 || data.mainDuration <= 0 || data.dessertDuration <= 0) {
+          setValidationError('Alle gangtijden moeten langer dan 0 minuten zijn.')
+          return false
+        }
+        break
+    }
+    setValidationError(null)
+    return true
+  }
+
+  function handleNext() {
+    if (validateStep()) {
+      setStep(step + 1)
+      setValidationError(null)
+    }
   }
 
   async function handlePublish() {
@@ -85,13 +134,18 @@ export function EventWizard() {
       </div>
       {stepComponents[step]}
       {step < STEPS.length - 1 && (
-        <div className="mt-6 flex justify-between">
-          <button onClick={() => setStep(step - 1)} disabled={step === 0} className="rounded px-4 py-2 text-sm disabled:opacity-30">
-            {t('stepBasics') && '← '}{t('stepBasics') && 'Terug'}
-          </button>
-          <button onClick={() => setStep(step + 1)} className="rounded bg-black px-4 py-2 text-sm text-white">
-            Volgende →
-          </button>
+        <div className="mt-6">
+          <div className="flex justify-between">
+            <button onClick={() => { setStep(step - 1); setValidationError(null) }} disabled={step === 0} className="rounded px-4 py-2 text-sm disabled:opacity-30">
+              {t('stepBasics') && '← '}{t('stepBasics') && 'Terug'}
+            </button>
+            <button onClick={handleNext} className="rounded bg-black px-4 py-2 text-sm text-white">
+              Volgende →
+            </button>
+          </div>
+          {validationError && (
+            <p className="mt-2 text-center text-sm text-red-600">{validationError}</p>
+          )}
         </div>
       )}
     </div>
