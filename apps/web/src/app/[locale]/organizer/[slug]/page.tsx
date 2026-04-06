@@ -13,6 +13,7 @@ import { MatchingOverview } from '@/components/organizer/matching-overview'
 import { NotificationLog } from '@/components/organizer/notification-log'
 import { WelcomeCardPlaceholder } from '@/components/organizer/welcome-card-placeholder'
 import { EventSettings } from '@/components/organizer/event-settings'
+import { ReinviteModal } from '@/components/organizer/reinvite-modal'
 import { ChevronLeft } from 'lucide-react'
 import type { CourseType } from '@/lib/types'
 
@@ -208,6 +209,18 @@ export default async function EventDetailPage({ params }: Props) {
   // ── Settings ──────────────────────────────────────────────────
   const isLocked = new Date(event.event_date).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000
 
+  // ── Reinvite: available events (only needed for completed events) ─
+  let availableEvents: Array<{ id: string; title: string }> = []
+  if (event.status === 'completed') {
+    const { data: openEvents } = await supabase
+      .from('events')
+      .select('id, title')
+      .eq('organizer_id', user.id)
+      .in('status', ['registration_open', 'confirmed'])
+      .neq('id', event.id)
+    availableEvents = openEvents ?? []
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <Link
@@ -255,6 +268,20 @@ export default async function EventDetailPage({ params }: Props) {
         dessertDuration={event.dessert_duration}
         isLocked={isLocked}
       />
+
+      {event.status === 'completed' && (
+        <div className="py-5">
+          <ReinviteModal
+            sourceEventId={event.id}
+            duos={duoData.map(d => ({
+              id: d.id,
+              person1_name: d.person1_name,
+              person2_name: d.person2_name,
+            }))}
+            availableEvents={availableEvents}
+          />
+        </div>
+      )}
     </div>
   )
 }
