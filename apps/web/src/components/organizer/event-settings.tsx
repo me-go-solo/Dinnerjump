@@ -17,6 +17,14 @@ type Props = {
 
 type EditingField = 'afterparty' | 'policy' | 'durations' | null
 
+function formatDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  if (hours === 0) return `${mins} minuten`
+  if (mins === 0) return `${hours} uur`
+  return `${hours} uur en ${mins} minuten`
+}
+
 export function EventSettings({
   eventId,
   afterpartyAddress,
@@ -208,9 +216,9 @@ export function EventSettings({
               {editing !== 'durations' && (
                 <p className="text-sm text-gray-500">
                   {t('durationFormat', {
-                    appetizer: appetizerDuration,
-                    main: mainDuration,
-                    dessert: dessertDuration,
+                    appetizer: formatDuration(appetizerDuration),
+                    main: formatDuration(mainDuration),
+                    dessert: formatDuration(dessertDuration),
                   })}
                 </p>
               )}

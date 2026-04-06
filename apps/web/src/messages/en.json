@@ -118,8 +118,8 @@
     "nextTable": "Next table — {count} more duo needed"
   },
   "organizer": {
-    "greeting": "Hello {name},",
-    "subtitle": "Below are the DinnerJump events you have organized.",
+    "greeting": "Welcome {name},",
+    "subtitle": "This is your dashboard. Here you create events, manage participants and keep an overview of all the events you organize.",
     "newEvent": "+ New Event",
     "viewEvent": "View this event",
     "backToOverview": "Back to overview",
@@ -182,8 +182,8 @@
     "invitationPolicy": "Invitation policy",
     "policyOrganizerOnly": "Organizer only",
     "policyParticipantsAllowed": "Participants may also invite",
-    "courseDurations": "Course durations",
-    "durationFormat": "Appetizer {appetizer} min · Main course {main} min · Dessert {dessert} min",
+    "courseDurations": "Time per course",
+    "durationFormat": "Appetizer {appetizer} · Main course {main} · Dessert {dessert}",
     "duplicate": "Duplicate",
     "reinvite": "Re-invite participants",
     "reinviteSelect": "Select duos to invite",

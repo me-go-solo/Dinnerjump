@@ -118,8 +118,8 @@
     "nextTable": "Volgende tafel — nog {count} duo nodig"
   },
   "organizer": {
-    "greeting": "Hallo {name},",
-    "subtitle": "Hieronder staan de DinnerJump events die je hebt georganiseerd.",
+    "greeting": "Welkom {name},",
+    "subtitle": "Dit is jouw dashboard. Hier maak je events aan, beheer je deelnemers en behoud je overzicht van al je events die je organiseert.",
     "newEvent": "+ Nieuw Event",
     "viewEvent": "Bekijk dit event",
     "backToOverview": "Terug naar overzicht",
@@ -182,8 +182,8 @@
     "invitationPolicy": "Uitnodigingsbeleid",
     "policyOrganizerOnly": "Alleen organisator",
     "policyParticipantsAllowed": "Deelnemers mogen ook uitnodigen",
-    "courseDurations": "Gangduren",
-    "durationFormat": "Voorgerecht {appetizer} min · Hoofdgerecht {main} min · Dessert {dessert} min",
+    "courseDurations": "Tijden per gang",
+    "durationFormat": "Voorgerecht {appetizer} · Hoofdgerecht {main} · Dessert {dessert}",
     "duplicate": "Dupliceer",
     "reinvite": "Nodig deelnemers opnieuw uit",
     "reinviteSelect": "Selecteer duo's om uit te nodigen",
