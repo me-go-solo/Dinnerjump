@@ -71,13 +71,12 @@
     "welcomeCard": "Send physical welcome card",
     "welcomeCardComingSoon": "Coming soon",
     "welcomeCardHelp": "Send a physical welcome card to all participants. This feature will be added later.",
-    "stepDurations": "Course durations",
+    "stepDurations": "Course times",
     "appetizerDuration": "Appetizer",
     "mainDuration": "Main course",
     "dessertDuration": "Dessert",
     "durationMinutes": "min",
     "totalEventDuration": "Total event duration",
-    "timezone": "Timezone",
     "publish": "Publish event"
   },
   "registration": {

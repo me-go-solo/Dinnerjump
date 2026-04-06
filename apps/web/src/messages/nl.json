@@ -71,13 +71,12 @@
     "welcomeCard": "Fysieke welkomstkaart versturen",
     "welcomeCardComingSoon": "Binnenkort beschikbaar",
     "welcomeCardHelp": "Verstuur een fysieke welkomstkaart naar alle deelnemers. Deze functie wordt later toegevoegd.",
-    "stepDurations": "Gangduren",
+    "stepDurations": "Gang tijden",
     "appetizerDuration": "Voorgerecht",
     "mainDuration": "Hoofdgerecht",
     "dessertDuration": "Nagerecht",
     "durationMinutes": "min",
     "totalEventDuration": "Totale duur evenement",
-    "timezone": "Tijdzone",
     "publish": "Publiceer event"
   },
   "registration": {

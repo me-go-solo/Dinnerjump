@@ -32,7 +32,6 @@ export type WizardData = {
   appetizerDuration: number
   mainDuration: number
   dessertDuration: number
-  timezone: string
 }
 
 const INITIAL_DATA: WizardData = {
@@ -41,8 +40,7 @@ const INITIAL_DATA: WizardData = {
   centerAddress: '', centerLat: 0, centerLng: 0, radiusKm: 2,
   invitationPolicy: 'organizer_only',
   afterpartyName: '', afterpartyAddress: '', welcomeCardEnabled: false,
-  appetizerDuration: 90, mainDuration: 120, dessertDuration: 60,
-  timezone: 'Europe/Amsterdam',
+  appetizerDuration: 75, mainDuration: 90, dessertDuration: 60,
 }
 
 const STEPS = ['basics', 'datetime', 'location', 'durations', 'policy', 'options', 'review'] as const

@@ -17,6 +17,7 @@
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.101.1",
     "deepl-node": "^1.25.0",
+    "geo-tz": "^8.1.6",
     "leaflet": "^1.9.4",
     "nanoid": "^5.1.7",
     "next": "16.2.2",

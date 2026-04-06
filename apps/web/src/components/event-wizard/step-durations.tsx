@@ -48,22 +48,6 @@ export function StepDurations({ data, onChange }: {
         <span className="text-xs text-gray-400"> (incl. {2 * data.travelTimeMinutes} min transport)</span>
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">{t('timezone')}</label>
-        <select
-          value={data.timezone}
-          onChange={(e) => onChange({ timezone: e.target.value })}
-          className="w-full rounded border px-3 py-2 text-sm"
-        >
-          {['Europe/Amsterdam', 'Europe/Berlin', 'Europe/Brussels', 'Europe/London',
-            'Europe/Paris', 'Europe/Rome', 'Europe/Madrid', 'Europe/Vienna',
-            'Europe/Zurich', 'Europe/Lisbon', 'America/New_York', 'America/Chicago',
-            'America/Los_Angeles', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney',
-            'UTC'].map(tz => (
-            <option key={tz} value={tz}>{tz.replace('_', ' ')}</option>
-          ))}
-        </select>
-      </div>
     </div>
   )
 }

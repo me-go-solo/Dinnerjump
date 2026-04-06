@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { generateInviteCode } from '@/lib/invite-code'
 import { generateEventSlug } from '@/lib/slug'
+import { find } from 'geo-tz'
 
 type CreateEventInput = {
   title: string
@@ -24,7 +25,6 @@ type CreateEventInput = {
   appetizerDuration: number
   mainDuration: number
   dessertDuration: number
-  timezone: string
 }
 
 export async function createEvent(input: CreateEventInput) {
@@ -34,6 +34,7 @@ export async function createEvent(input: CreateEventInput) {
 
   const slug = generateEventSlug(input.title)
   const inviteCode = generateInviteCode()
+  const timezone = find(input.centerLat, input.centerLng)[0] ?? 'Europe/Amsterdam'
 
   const eventDate = new Date(input.eventDate)
   const deadline = new Date(eventDate)
@@ -66,7 +67,7 @@ export async function createEvent(input: CreateEventInput) {
       appetizer_duration: input.appetizerDuration,
       main_duration: input.mainDuration,
       dessert_duration: input.dessertDuration,
-      timezone: input.timezone,
+      timezone,
       registration_deadline: deadline.toISOString(),
     })
     .select()

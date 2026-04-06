@@ -1,8 +1,8 @@
 export const COURSE_ORDER = ['appetizer', 'main', 'dessert'] as const
 
 export const DEFAULT_DURATIONS = {
-  appetizer: 90,
-  main: 120,
+  appetizer: 75,
+  main: 90,
   dessert: 60,
 } as const
 
