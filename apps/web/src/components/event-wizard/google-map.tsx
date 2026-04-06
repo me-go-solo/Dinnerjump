@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import { GoogleMap, Marker, Circle, useJsApiLoader } from '@react-google-maps/api'
 
 const containerStyle = { width: '100%', height: '350px' }
@@ -20,26 +20,27 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map
+    // Fit bounds once on initial load
+    const circle = new google.maps.Circle({ center, radius })
+    const bounds = circle.getBounds()
+    if (bounds) map.fitBounds(bounds, 20)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fitBounds = useCallback(() => {
+  // Fit bounds when radius changes (not on every center change to avoid jitter)
+  useEffect(() => {
     const map = mapRef.current
     if (!map) return
     const circle = new google.maps.Circle({ center, radius })
     const bounds = circle.getBounds()
     if (bounds) map.fitBounds(bounds, 20)
-  }, [center, radius])
+  }, [radius]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDragEnd = useCallback((e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
       onCenterChange(e.latLng.lat(), e.latLng.lng())
     }
   }, [onCenterChange])
-
-  // Fit bounds when center/radius changes
-  const onMapIdle = useCallback(() => {
-    fitBounds()
-  }, [fitBounds])
 
   if (!isLoaded) {
     return (
@@ -55,7 +56,6 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
         mapContainerStyle={containerStyle}
         center={center}
         zoom={13}
-        onLoad={onLoad}
         options={{
           disableDefaultUI: false,
           zoomControl: true,
@@ -63,6 +63,7 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
           mapTypeControl: false,
           fullscreenControl: false,
         }}
+        onLoad={onLoad}
       >
         <Marker
           position={center}
@@ -79,7 +80,6 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
             fillColor: '#000000',
             fillOpacity: 0.08,
           }}
-          onLoad={() => fitBounds()}
         />
       </GoogleMap>
     </div>
