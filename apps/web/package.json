@@ -19,6 +19,7 @@
     "deepl-node": "^1.25.0",
     "geo-tz": "^8.1.6",
     "leaflet": "^1.9.4",
+    "lucide-react": "^1.7.0",
     "nanoid": "^5.1.7",
     "next": "16.2.2",
     "next-intl": "^4.9.0",

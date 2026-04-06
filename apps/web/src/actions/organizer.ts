@@ -54,7 +54,7 @@ export async function sendEmailToParticipants(eventId: string, body: string) {
     })
 
     // Log notification
-    await admin.from('notification_log').insert({
+    await (admin.from as any)('notification_log').insert({
       event_id: eventId,
       type: 'email',
       subject: `Update: ${event.title}`,
@@ -102,7 +102,7 @@ export async function sendEmergencyPush(eventId: string, message: string) {
     )
 
     // Log notification
-    await admin.from('notification_log').insert({
+    await (admin.from as any)('notification_log').insert({
       event_id: eventId,
       type: 'push',
       body: message,
