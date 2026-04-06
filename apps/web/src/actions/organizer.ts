@@ -24,7 +24,7 @@ async function requireOrganizer(eventId: string) {
 
 export async function sendEmailToParticipants(eventId: string, body: string) {
   try {
-    const { event } = await requireOrganizer(eventId)
+    const { user, event } = await requireOrganizer(eventId)
     const admin = createAdminClient()
 
     // Get confirmed duos and their participant profile emails
@@ -53,6 +53,16 @@ export async function sendEmailToParticipants(eventId: string, body: string) {
       text: body,
     })
 
+    // Log notification
+    await admin.from('notification_log').insert({
+      event_id: eventId,
+      type: 'email',
+      subject: `Update: ${event.title}`,
+      body,
+      recipient_count: emails.length,
+      sent_by: user.id,
+    })
+
     return { success: true, count: emails.length }
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Unknown error' }
@@ -61,7 +71,7 @@ export async function sendEmailToParticipants(eventId: string, body: string) {
 
 export async function sendEmergencyPush(eventId: string, message: string) {
   try {
-    const { event } = await requireOrganizer(eventId)
+    const { user, event } = await requireOrganizer(eventId)
     const admin = createAdminClient()
 
     const { data: duos } = await admin.from('duos')
@@ -90,6 +100,15 @@ export async function sendEmergencyPush(eventId: string, message: string) {
         priority: 'high' as const,
       }))
     )
+
+    // Log notification
+    await admin.from('notification_log').insert({
+      event_id: eventId,
+      type: 'push',
+      body: message,
+      recipient_count: tokens.length,
+      sent_by: user.id,
+    })
 
     return { success: true, count: tokens.length }
   } catch (e) {
@@ -183,13 +202,11 @@ export async function promoteDuo(eventId: string, duoId: string) {
 export async function updateEventSettings(
   eventId: string,
   settings: {
-    title?: string
-    description?: string | null
     afterparty_address?: string | null
-    afterparty_lat?: number | null
-    afterparty_lng?: number | null
-    welcome_card_enabled?: boolean
     invitation_policy?: 'organizer_only' | 'participants_allowed'
+    appetizer_duration?: number
+    main_duration?: number
+    dessert_duration?: number
   }
 ) {
   try {
