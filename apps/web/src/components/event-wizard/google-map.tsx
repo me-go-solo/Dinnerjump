@@ -11,6 +11,19 @@ type Props = {
   onCenterChange: (lat: number, lng: number) => void
 }
 
+// Calculate bounds from center + radius without creating a Circle object
+function computeBounds(center: { lat: number; lng: number }, radiusMeters: number) {
+  const R = 6371000 // Earth radius in meters
+  const dLat = (radiusMeters / R) * (180 / Math.PI)
+  const dLng = (radiusMeters / (R * Math.cos((center.lat * Math.PI) / 180))) * (180 / Math.PI)
+  return {
+    south: center.lat - dLat,
+    north: center.lat + dLat,
+    west: center.lng - dLng,
+    east: center.lng + dLng,
+  }
+}
+
 export function GoogleMapView({ center, radius, onCenterChange }: Props) {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
@@ -20,11 +33,8 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map
-    // Fit bounds once on initial load (invisible helper circle, removed immediately)
-    const helper = new google.maps.Circle({ center, radius })
-    const bounds = helper.getBounds()
-    if (bounds) map.fitBounds(bounds, 20)
-    helper.setMap(null)
+    const b = computeBounds(center, radius)
+    map.fitBounds({ south: b.south, north: b.north, west: b.west, east: b.east }, 20)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -32,10 +42,8 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
-    const helper = new google.maps.Circle({ center, radius })
-    const bounds = helper.getBounds()
-    if (bounds) map.fitBounds(bounds, 20)
-    helper.setMap(null)
+    const b = computeBounds(center, radius)
+    map.fitBounds({ south: b.south, north: b.north, west: b.west, east: b.east }, 20)
   }, [radius]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDragEnd = useCallback((e: google.maps.MapMouseEvent) => {
