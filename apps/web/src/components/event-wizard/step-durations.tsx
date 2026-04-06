@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { formatDuration } from '@/lib/format'
 import type { WizardData } from './wizard'
 
 export function StepDurations({ data, onChange }: {
@@ -31,8 +32,8 @@ export function StepDurations({ data, onChange }: {
               onClick={() => onChange({ [key]: Math.max(30, data[key] - 15) })}
               className="h-8 w-8 rounded border text-sm font-medium"
             >−</button>
-            <span className="w-16 text-center text-sm font-medium">
-              {data[key]} {t('durationMinutes')}
+            <span className="w-40 text-center text-sm font-medium">
+              {formatDuration(data[key])}
             </span>
             <button
               type="button"
@@ -44,7 +45,7 @@ export function StepDurations({ data, onChange }: {
       ))}
 
       <div className="rounded bg-gray-50 p-3 text-sm text-gray-600">
-        {t('totalEventDuration')}: <strong>{Math.floor(total / 60)}u {total % 60}m</strong>
+        {t('totalEventDuration')}: <strong>{formatDuration(total)}</strong>
         <span className="text-xs text-gray-400"> (incl. {2 * data.travelTimeMinutes} min transport)</span>
       </div>
 
