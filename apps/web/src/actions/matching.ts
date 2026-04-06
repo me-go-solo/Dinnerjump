@@ -180,6 +180,102 @@ export async function approveMatching(eventId: string) {
   return { success: true }
 }
 
+export async function saveMatchOverride(
+  eventId: string,
+  tables: Array<{
+    id: string
+    course: string
+    tableNumber: number
+    hostDuoId: string
+    hostName: string
+    hostCity: string
+    guests: Array<{ duoId: string; name: string; city: string }>
+  }>
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: event } = await supabase
+    .from('events')
+    .select('id, organizer_id')
+    .eq('id', eventId)
+    .single()
+  if (!event || event.organizer_id !== user.id) return { error: 'Not authorized' }
+
+  // Validate
+  const { validateTableData } = await import('@/lib/matching')
+  const validation = validateTableData(tables)
+  if (!validation.valid) {
+    return { error: 'Ongeldige indeling', errors: validation.errors }
+  }
+
+  const admin = createAdminClient()
+
+  const { data: currentMatch } = await admin
+    .from('matches')
+    .select('id, version')
+    .eq('event_id', eventId)
+    .eq('is_active', true)
+    .single()
+
+  if (!currentMatch) return { error: 'No active match found' }
+
+  const nextVersion = currentMatch.version + 1
+
+  await admin.from('matches').update({ is_active: false }).eq('id', currentMatch.id)
+
+  const { data: newMatch, error: matchError } = await admin
+    .from('matches')
+    .insert({ event_id: eventId, version: nextVersion, is_active: true })
+    .select('id')
+    .single()
+
+  if (matchError || !newMatch) return { error: 'Failed to create new version' }
+
+  const assignments = new Map<string, CourseType>()
+  for (const table of tables) {
+    assignments.set(table.hostDuoId, table.course as CourseType)
+  }
+
+  const allDuoIds = [...new Set(tables.flatMap(t => [t.hostDuoId, ...t.guests.map(g => g.duoId)]))]
+
+  const { data: duos } = await admin.from('duos').select('id, person1_id').in('id', allDuoIds)
+  const { data: profiles } = await admin.from('profiles').select('id, display_name').in('id', (duos ?? []).map(d => d.person1_id))
+  const nameMap = new Map((profiles ?? []).map(p => [p.id, p.display_name ?? 'Onbekend']))
+  const duoNameMap = new Map((duos ?? []).map(d => [d.id, nameMap.get(d.person1_id) ?? 'Onbekend']))
+
+  await admin.from('match_assignments').insert(
+    allDuoIds.map(duoId => ({
+      match_id: newMatch.id,
+      duo_id: duoId,
+      hosted_course: assignments.get(duoId) ?? 'appetizer' as CourseType,
+      duo_display_name: duoNameMap.get(duoId) ?? 'Onbekend',
+    }))
+  )
+
+  for (const table of tables) {
+    const { data: tableRow } = await admin
+      .from('match_tables')
+      .insert({
+        match_id: newMatch.id,
+        course: table.course as CourseType,
+        table_number: table.tableNumber,
+        host_duo_id: table.hostDuoId,
+      })
+      .select('id')
+      .single()
+
+    if (tableRow) {
+      await admin.from('match_table_guests').insert(
+        table.guests.map(g => ({ match_table_id: tableRow.id, duo_id: g.duoId }))
+      )
+    }
+  }
+
+  return { success: true, version: nextVersion }
+}
+
 export async function setActiveMatchVersion(eventId: string, version: number) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
