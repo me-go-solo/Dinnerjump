@@ -198,6 +198,8 @@
     "statusCancelled": "Geannuleerd",
     "appetizer": "Voorgerecht",
     "main": "Hoofdgerecht",
-    "dessert": "Dessert"
+    "dessert": "Dessert",
+    "noMessages": "Nog geen berichten verstuurd",
+    "statusRegistrationOpen": "Registratie open"
   }
 }

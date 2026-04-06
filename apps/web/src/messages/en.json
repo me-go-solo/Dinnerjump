@@ -198,6 +198,8 @@
     "statusCancelled": "Cancelled",
     "appetizer": "Appetizer",
     "main": "Main course",
-    "dessert": "Dessert"
+    "dessert": "Dessert",
+    "noMessages": "No messages sent yet",
+    "statusRegistrationOpen": "Registration open"
   }
 }
