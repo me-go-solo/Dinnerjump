@@ -20,20 +20,22 @@ export function GoogleMapView({ center, radius, onCenterChange }: Props) {
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map
-    // Fit bounds once on initial load
-    const circle = new google.maps.Circle({ center, radius })
-    const bounds = circle.getBounds()
+    // Fit bounds once on initial load (invisible helper circle, removed immediately)
+    const helper = new google.maps.Circle({ center, radius })
+    const bounds = helper.getBounds()
     if (bounds) map.fitBounds(bounds, 20)
+    helper.setMap(null)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Fit bounds when radius changes (not on every center change to avoid jitter)
+  // Fit bounds when radius changes
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
-    const circle = new google.maps.Circle({ center, radius })
-    const bounds = circle.getBounds()
+    const helper = new google.maps.Circle({ center, radius })
+    const bounds = helper.getBounds()
     if (bounds) map.fitBounds(bounds, 20)
+    helper.setMap(null)
   }, [radius]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDragEnd = useCallback((e: google.maps.MapMouseEvent) => {
