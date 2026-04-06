@@ -109,7 +109,7 @@ CREATE TABLE reveals (
 );
 ```
 
-Na goedkeuring van de matching door de organisator worden 7 reveals aangemaakt met berekende `scheduled_at` tijden. Een cron job zet `revealed_at` op het juiste moment. De app toont alleen data waarvoor `revealed_at IS NOT NULL`.
+Na goedkeuring van de matching door de organisator worden 7 reveals aangemaakt met berekende `scheduled_at` tijden (TIMESTAMPTZ, gebaseerd op event-tijdzone). Een cron job zet `revealed_at` op het juiste moment. De app toont alleen data waarvoor `revealed_at IS NOT NULL`.
 
 ### Nieuwe tabel: `push_tokens`
 
@@ -227,8 +227,9 @@ Expo Push API (abstraheert APNs + FCM):
 
 1. Bij eerste login → app vraagt notificatie-permissie
 2. Expo Push Token wordt opgeslagen in `push_tokens` tabel
-3. Server-side: cron job stuurt notificaties via Expo Push API wanneer reveals actief worden
-4. 15 min vóór elke reveal: extra alarm-notificatie
+3. Bij elke app-start: token opnieuw ophalen en upserten (tokens kunnen veranderen na herinstallatie of OS-update)
+4. Server-side: cron job stuurt notificaties via Expo Push API wanneer reveals actief worden
+5. 15 min vóór elke reveal: extra alarm-notificatie
 
 ## Offline strategie
 
