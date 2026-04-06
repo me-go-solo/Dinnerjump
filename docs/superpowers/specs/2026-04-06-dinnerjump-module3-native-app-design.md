@@ -81,9 +81,12 @@ ALTER TABLE events ADD COLUMN appetizer_duration INTEGER NOT NULL DEFAULT 90;
 ALTER TABLE events ADD COLUMN main_duration INTEGER NOT NULL DEFAULT 120;
 ALTER TABLE events ADD COLUMN dessert_duration INTEGER NOT NULL DEFAULT 60;
 ALTER TABLE events ADD COLUMN event_start_time TIME NOT NULL DEFAULT '18:00';
+ALTER TABLE events ADD COLUMN timezone TEXT NOT NULL DEFAULT 'Europe/Amsterdam';
 ```
 
 Gangduren in minuten. Organisator kan aanpassen per 15 minuten. Defaults: voorgerecht 1,5u, hoofdgerecht 2u, dessert 1u.
+
+De `timezone` kolom bevat een IANA timezone identifier (bijv. `'Europe/Amsterdam'`, `'America/New_York'`, `'Asia/Tokyo'`). Deze wordt automatisch afgeleid uit de event-locatie bij aanmaak en is handmatig aanpasbaar. Alle reveal-tijden worden berekend in de event-tijdzone — zodat D-1 altijd "de dag ervoor" is in lokale tijd, ongeacht waar de Supabase server draait.
 
 ### Nieuwe tabel: `reveals`
 
