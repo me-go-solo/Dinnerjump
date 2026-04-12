@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native'
 import { useRouter } from 'expo-router'
 import * as Notifications from 'expo-notifications'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Camera } from 'lucide-react-native'
 import { useMyEvent } from '../../lib/hooks/useMyEvent'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
@@ -24,15 +26,20 @@ type TablemateInfo = {
 }
 
 async function scheduleDessertPhotoReminder(eventId: string) {
+  const reminderKey = `dessert_reminder_sent_${eventId}`
+  const alreadySent = await AsyncStorage.getItem(reminderKey)
+  if (alreadySent) return
+
   const alreadyShared = await hasSharedPhoto(eventId)
   if (alreadyShared) return
 
+  await AsyncStorage.setItem(reminderKey, 'true')
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Deel een leuke foto van de avond!',
       body: 'Kies of maak een foto met een DinnerJump frame en deel het via social.',
     },
-    trigger: null, // Fire immediately
+    trigger: null,
   })
 }
 
@@ -66,7 +73,7 @@ function ShareCard() {
           justifyContent: 'center',
         }}
       >
-        <Text style={{ fontSize: 18 }}>📷</Text>
+        <Camera size={18} color="#fff" />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ color: '#fff', fontSize: 13, fontWeight: '500' }}>Deel je avond</Text>

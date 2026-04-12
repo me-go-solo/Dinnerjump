@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native'
+import { Camera, Image } from 'lucide-react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { captureRef } from 'react-native-view-shot'
 import { useMyEvent } from '../../lib/hooks/useMyEvent'
@@ -105,12 +106,12 @@ export default function PhotoScreen() {
 
         <View style={styles.pickerRow}>
           <TouchableOpacity style={styles.pickerButton} onPress={takePhoto} activeOpacity={0.7}>
-            <Text style={styles.pickerIcon}>📷</Text>
+            <Camera size={36} color="#ccc" />
             <Text style={styles.pickerLabel}>Camera</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.pickerButton} onPress={pickFromGallery} activeOpacity={0.7}>
-            <Text style={styles.pickerIcon}>🖼</Text>
+            <Image size={36} color="#ccc" />
             <Text style={styles.pickerLabel}>Galerij</Text>
           </TouchableOpacity>
         </View>

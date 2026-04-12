@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderRightWidth: 2,
     borderColor: GOLD,
-    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
   },
   overlay: {
     position: 'absolute',

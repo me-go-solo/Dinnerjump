@@ -1,5 +1,4 @@
 // apps/mobile/lib/photo-sharing.ts
-import { Platform, Linking } from 'react-native'
 import * as Sharing from 'expo-sharing'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -53,15 +52,6 @@ export async function shareImage(
   eventTitle: string,
 ): Promise<void> {
   const text = getShareText(eventTitle)
-
-  if (platform === 'instagram' && Platform.OS === 'ios') {
-    const url = `instagram-stories://share?source_application=dinnerjump`
-    const canOpen = await Linking.canOpenURL(url)
-    if (canOpen) {
-      await Linking.openURL(url)
-      return
-    }
-  }
 
   if (await Sharing.isAvailableAsync()) {
     await Sharing.shareAsync(imageUri, {
