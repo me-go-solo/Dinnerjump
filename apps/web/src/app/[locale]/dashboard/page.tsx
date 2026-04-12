@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Link } from '@/i18n/navigation'
+import { WelcomeCard } from '@/components/welcome-card'
 
 export default async function DashboardPage() {
   const t = await getTranslations('dashboard')
@@ -11,6 +12,12 @@ export default async function DashboardPage() {
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', user.id)
+    .single()
 
   const { data: myDuos } = await supabase.from('duos').select('event_id, status')
     .or(`person1_id.eq.${user.id},person2_id.eq.${user.id}`).neq('status', 'cancelled')
@@ -23,9 +30,16 @@ export default async function DashboardPage() {
   const { data: organizingEvents } = await supabase.from('events').select('*')
     .eq('organizer_id', user.id).order('event_date', { ascending: true })
 
+  const showWelcome = !organizingEvents || organizingEvents.length === 0
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <h1 className="mb-8 text-2xl font-bold">{t('title')}</h1>
+
+      {showWelcome && (
+        <WelcomeCard displayName={profile?.display_name ?? ''} />
+      )}
+
       <section className="mb-8">
         <h2 className="mb-4 text-lg font-semibold">{t('asParticipant')}</h2>
         {participatingEvents && participatingEvents.length > 0 ? (

@@ -2,27 +2,55 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { Mail } from 'lucide-react'
 import { signIn, signUp } from '@/actions/auth'
 import { useRouter } from '@/i18n/navigation'
 
 export function AuthForm({ mode = 'login' }: { mode?: 'login' | 'register' }) {
   const t = useTranslations('common')
+  const tAuth = useTranslations('auth')
   const router = useRouter()
   const [isRegister, setIsRegister] = useState(mode === 'register')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState<string | null>(null)
 
   async function handleSubmit(formData: FormData) {
     setLoading(true)
     setError(null)
-    const result = isRegister ? await signUp(formData) : await signIn(formData)
-    if (result.error) {
-      setError(result.error)
+    const email = formData.get('email') as string
+
+    if (isRegister) {
+      const result = await signUp(formData)
+      if (result.error) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+      setEmailSent(email)
       setLoading(false)
-      return
+    } else {
+      const result = await signIn(formData)
+      if (result.error) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+      router.push('/dashboard')
+      router.refresh()
     }
-    router.push('/dashboard')
-    router.refresh()
+  }
+
+  if (emailSent) {
+    return (
+      <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
+        <Mail className="h-10 w-10 text-gray-600" />
+        <h2 className="text-xl font-bold">{tAuth('confirmTitle')}</h2>
+        <p className="text-gray-500">
+          {tAuth('confirmDescription', { email: emailSent })}
+        </p>
+      </div>
+    )
   }
 
   return (

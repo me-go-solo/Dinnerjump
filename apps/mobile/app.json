@@ -10,7 +10,22 @@
     "scheme": "dinnerjump",
     "plugins": [
       "expo-router",
-      ["expo-notifications", { "sounds": [] }]
+      [
+        "expo-notifications",
+        {
+          "sounds": []
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "extraPods": [],
+            "ccacheEnabled": false
+          }
+        }
+      ],
+      "./plugins/withSwiftConcurrencyFix"
     ],
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -19,7 +34,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "nl.dinnerjump.app"
+      "bundleIdentifier": "nl.dinnerjump.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +50,13 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a50fbd4e-a788-4d8e-8e04-9d38fec3b994"
+      }
+    },
+    "owner": "patzin"
   }
 }

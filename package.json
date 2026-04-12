@@ -19,6 +19,9 @@
       "sharp",
       "supabase",
       "unrs-resolver"
-    ]
+    ],
+    "patchedDependencies": {
+      "expo-image": "patches/expo-image.patch"
+    }
   }
 }

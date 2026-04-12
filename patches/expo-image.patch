@@ -1,0 +1,13 @@
+diff --git a/ios/ContentPosition.swift b/ios/ContentPosition.swift
+index 73c34ca66c29b82a0be732ac063b4aae69bac56b..905f068bf843b5e522bd9a31fd8c220d8d4c6ff7 100644
+--- a/ios/ContentPosition.swift
++++ b/ios/ContentPosition.swift
+@@ -10,7 +10,7 @@ typealias ContentPositionValue = Either<Double, String>
+  - Note: Its intention is to behave like the CSS [`object-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/object-position) property.
+  */
+ struct ContentPosition: Record {
+-  static let center = Self()
++  nonisolated(unsafe) static let center = Self()
+ 
+   @Field
+   var top: ContentPositionValue?

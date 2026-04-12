@@ -104,12 +104,24 @@
     "remaining": "Nog {count} uitnodigingen over",
     "limitReached": "Je hebt alle 5 uitnodigingen verstuurd"
   },
+  "notFound": {
+    "title": "Pagina niet gevonden",
+    "description": "De pagina die je zoekt bestaat niet of is verplaatst.",
+    "backHome": "Terug naar home"
+  },
+  "auth": {
+    "confirmTitle": "Check je e-mail",
+    "confirmDescription": "We hebben een bevestigingslink gestuurd naar {email}. Klik op de link om toegang te krijgen tot DinnerJump."
+  },
   "dashboard": {
     "title": "Mijn events",
     "asParticipant": "Als deelnemer",
     "asOrganizer": "Als organisator",
     "noEvents": "Je doet nog niet mee aan een event.",
-    "createFirst": "Organiseer je eerste Dinner Jump"
+    "createFirst": "Organiseer je eerste Dinner Jump",
+    "welcomeTitle": "Hoi {name}, leuk dat je een DinnerJump wil organiseren!",
+    "welcomeDescription": "Begin met het aanmaken van je eerste event.",
+    "welcomeCta": "Maak je eerste event"
   },
   "thermometer": {
     "minimum": "Minimum: 9 duo's",
