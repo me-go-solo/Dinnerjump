@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native'
 import { useRouter } from 'expo-router'
+import * as Notifications from 'expo-notifications'
 import { useMyEvent } from '../../lib/hooks/useMyEvent'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
+import { hasSharedPhoto } from '../../lib/photo-sharing'
 import { CountdownTimer } from '../../components/CountdownTimer'
 import { RevealCard } from '../../components/RevealCard'
 import { TablematePreview } from '../../components/TablematePreview'
@@ -19,6 +21,19 @@ const AVATAR_COLORS = ['#e94560', '#4ecdc4', '#a78bfa', '#f5a623', '#6366f1', '#
 type TablemateInfo = {
   name: string
   isHost: boolean
+}
+
+async function scheduleDessertPhotoReminder(eventId: string) {
+  const alreadyShared = await hasSharedPhoto(eventId)
+  if (alreadyShared) return
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'Deel een leuke foto van de avond!',
+      body: 'Kies of maak een foto met een DinnerJump frame en deel het via social.',
+    },
+    trigger: null, // Fire immediately
+  })
 }
 
 function ShareCard() {
@@ -89,6 +104,18 @@ export default function HomeScreen() {
 
     loadTablemates()
   }, [event, duo, reveals])
+
+  // Send photo reminder notification when dessert course is revealed
+  useEffect(() => {
+    if (!event || !reveals.length) return
+
+    const dessertRevealed = reveals.some(
+      (r) => r.reveal_type === 'course_3_full' && r.executed_at
+    )
+    if (dessertRevealed && event?.id) {
+      scheduleDessertPhotoReminder(event.id)
+    }
+  }, [event, reveals])
 
   async function loadTablemates() {
     if (!event || !duo) return
