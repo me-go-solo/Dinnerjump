@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native'
+import { useRouter } from 'expo-router'
 import { useMyEvent } from '../../lib/hooks/useMyEvent'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
@@ -18,6 +19,49 @@ const AVATAR_COLORS = ['#e94560', '#4ecdc4', '#a78bfa', '#f5a623', '#6366f1', '#
 type TablemateInfo = {
   name: string
   isHost: boolean
+}
+
+function ShareCard() {
+  const router = useRouter()
+
+  return (
+    <TouchableOpacity
+      style={{
+        marginHorizontal: 20,
+        marginVertical: 12,
+        backgroundColor: 'rgba(255, 107, 53, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 107, 53, 0.2)',
+        borderRadius: 14,
+        padding: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+      }}
+      onPress={() => router.push('/photo')}
+      activeOpacity={0.7}
+    >
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          backgroundColor: '#FF6B35',
+          borderRadius: 12,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 18 }}>📷</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: '#fff', fontSize: 13, fontWeight: '500' }}>Deel je avond</Text>
+        <Text style={{ color: 'rgba(255, 180, 120, 0.6)', fontSize: 10 }}>
+          Maak een foto met DinnerJump frame
+        </Text>
+      </View>
+      <Text style={{ color: 'rgba(255, 180, 120, 0.4)', fontSize: 16 }}>›</Text>
+    </TouchableOpacity>
+  )
 }
 
 export default function HomeScreen() {
@@ -310,6 +354,9 @@ export default function HomeScreen() {
           />
         </View>
       )}
+
+      {/* Deel je avond */}
+      <ShareCard />
 
       {/* Tijdschema */}
       <View style={{ marginHorizontal: 20, marginBottom: 16, padding: 16, backgroundColor: '#1a1a2e', borderRadius: 12 }}>
