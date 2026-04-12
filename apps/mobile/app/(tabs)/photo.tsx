@@ -1,5 +1,5 @@
 // apps/mobile/app/(tabs)/photo.tsx
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   View,
   Text,
@@ -26,6 +26,8 @@ export default function PhotoScreen() {
   const { event, hostedCourse } = useMyEvent()
   const [photoUri, setPhotoUri] = useState<string | null>(null)
   const [aspectRatio, setAspectRatio] = useState<FrameAspectRatio>('9:16')
+  const [pendingShare, setPendingShare] = useState<SharePlatform | null>(null)
+  const [isSharing, setIsSharing] = useState(false)
   const frameRef = useRef<View>(null)
 
   const pickFromGallery = useCallback(async () => {
@@ -54,28 +56,37 @@ export default function PhotoScreen() {
     }
   }, [])
 
-  const handleShare = useCallback(
-    async (platform: SharePlatform) => {
-      if (!frameRef.current || !event) return
+  // Trigger capture after aspect ratio change has rendered
+  useEffect(() => {
+    if (!pendingShare || !frameRef.current || !event) return
 
-      const ratio = getAspectRatioForPlatform(platform)
-      setAspectRatio(ratio)
-
-      // Small delay to let the frame re-render with new ratio
-      await new Promise((r) => setTimeout(r, 100))
-
+    const capture = async () => {
+      setIsSharing(true)
       try {
-        const uri = await captureRef(frameRef, {
-          format: 'png',
-          quality: 1,
-        })
-        await shareImage(uri, platform, event.title)
+        // Wait for next frame to ensure render is complete
+        await new Promise(resolve => requestAnimationFrame(resolve))
+        const uri = await captureRef(frameRef, { format: 'png', quality: 1 })
+        await shareImage(uri, event.title)
         await markPhotoShared(event.id)
       } catch (err) {
         Alert.alert('Delen mislukt', 'Er ging iets mis bij het delen. Probeer het opnieuw.')
+      } finally {
+        setIsSharing(false)
+        setPendingShare(null)
       }
+    }
+
+    capture()
+  }, [pendingShare, event])
+
+  const handleShare = useCallback(
+    (platform: SharePlatform) => {
+      if (isSharing) return
+      const ratio = getAspectRatioForPlatform(platform)
+      setAspectRatio(ratio)
+      setPendingShare(platform)
     },
-    [event],
+    [isSharing],
   )
 
   if (!event) {
@@ -137,7 +148,7 @@ export default function PhotoScreen() {
         />
       </View>
 
-      <ShareButtons onShare={handleShare} />
+      <ShareButtons onShare={handleShare} isSharing={isSharing} />
 
       <TouchableOpacity
         style={styles.retakeButton}
@@ -199,10 +210,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 180, 100, 0.15)',
-  },
-  pickerIcon: {
-    fontSize: 36,
-    marginBottom: 8,
   },
   pickerLabel: {
     color: '#ccc',

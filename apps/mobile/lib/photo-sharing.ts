@@ -39,16 +39,15 @@ export function getDimensionsForRatio(ratio: FrameAspectRatio): { width: number;
  * Generates share text with hashtags.
  */
 export function getShareText(eventTitle: string): string {
-  const hashtag = eventTitle.replace(/\s+/g, '')
+  const hashtag = eventTitle.replace(/[^a-zA-Z0-9]/g, '')
   return `Wat een avond! #DinnerJump #${hashtag}`
 }
 
 /**
- * Share image to a specific platform or generic share sheet.
+ * Share image via the system share sheet.
  */
 export async function shareImage(
   imageUri: string,
-  platform: SharePlatform,
   eventTitle: string,
 ): Promise<void> {
   const text = getShareText(eventTitle)

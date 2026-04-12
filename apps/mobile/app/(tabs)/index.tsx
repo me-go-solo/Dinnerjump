@@ -15,7 +15,7 @@ import { TablematePreview } from '../../components/TablematePreview'
 const COURSE_LABELS: Record<string, string> = {
   appetizer: 'Voorgerecht',
   main: 'Hoofdgerecht',
-  dessert: 'Nagerecht',
+  dessert: 'Dessert',
 }
 
 const AVATAR_COLORS = ['#e94560', '#4ecdc4', '#a78bfa', '#f5a623', '#6366f1', '#ec4899']
@@ -39,7 +39,7 @@ async function scheduleDessertPhotoReminder(eventId: string) {
       title: 'Deel een leuke foto van de avond!',
       body: 'Kies of maak een foto met een DinnerJump frame en deel het via social.',
     },
-    trigger: null,
+    trigger: { type: 'timeInterval', seconds: 900 } as any,
   })
 }
 
