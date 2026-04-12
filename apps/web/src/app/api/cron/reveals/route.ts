@@ -17,13 +17,13 @@ export async function GET(request: NextRequest) {
   const { data: pendingReveals } = await admin
     .from('reveals')
     .select('id, event_id, reveal_type, scheduled_at')
-    .is('executed_at', null)
+    .is('revealed_at', null)
     .lte('scheduled_at', new Date().toISOString())
 
   let activated = 0
   for (const reveal of pendingReveals ?? []) {
     await admin.from('reveals')
-      .update({ executed_at: new Date().toISOString() })
+      .update({ revealed_at: new Date().toISOString() })
       .eq('id', reveal.id)
 
     // Get event participants' push tokens + emails
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
   const { data: upcomingReveals } = await admin
     .from('reveals')
     .select('id, event_id, reveal_type, scheduled_at')
-    .is('executed_at', null)
+    .is('revealed_at', null)
     .gte('scheduled_at', fifteenMinBefore)
     .lte('scheduled_at', fifteenMinLater)
 

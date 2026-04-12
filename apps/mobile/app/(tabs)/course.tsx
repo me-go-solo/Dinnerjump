@@ -45,7 +45,7 @@ export default function CourseScreen() {
     if (!event || !duo) return
     setCourseLoading(true)
 
-    const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.executed_at)
+    const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.revealed_at)
 
     // Determine active course based on reveal state
     let course: 'appetizer' | 'main' | 'dessert' | null = null
@@ -201,7 +201,7 @@ export default function CourseScreen() {
   }
 
   // Determine next course reveal
-  const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.executed_at)
+  const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.revealed_at)
   let nextCourseReveal: { type: string; scheduledAt: string } | null = null
   if (activeCourse.course === 'appetizer' && !isRevealed('course_2_full')) {
     const r = reveals.find(r => r.reveal_type === 'course_2_full')

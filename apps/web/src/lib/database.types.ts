@@ -58,8 +58,8 @@ export interface Database {
         Relationships: [{ foreignKeyName: 'match_table_guests_match_table_id_fkey'; columns: ['match_table_id']; isOneToOne: false; referencedRelation: 'match_tables'; referencedColumns: ['id'] }]
       }
       reveals: {
-        Row: { id: string; event_id: string; reveal_type: string; scheduled_at: string; executed_at: string | null; created_at: string }
-        Insert: { id?: string; event_id: string; reveal_type: string; scheduled_at: string; executed_at?: string | null }
+        Row: { id: string; event_id: string; reveal_type: string; scheduled_at: string; revealed_at: string | null; created_at: string }
+        Insert: { id?: string; event_id: string; reveal_type: string; scheduled_at: string; revealed_at?: string | null }
         Update: Partial<Database['public']['Tables']['reveals']['Insert']>
         Relationships: [{ foreignKeyName: 'reveals_event_id_fkey'; columns: ['event_id']; isOneToOne: false; referencedRelation: 'events'; referencedColumns: ['id'] }]
       }

@@ -40,7 +40,7 @@ export default function RouteScreen() {
     if (!event || !duo) return
     setRouteLoading(true)
 
-    const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.executed_at)
+    const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.revealed_at)
 
     // Determine which course to navigate to
     let course: 'appetizer' | 'main' | 'dessert' | null = null

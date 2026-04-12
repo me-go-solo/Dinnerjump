@@ -29,7 +29,7 @@ type RevealData = {
   id: string
   reveal_type: string
   scheduled_at: string
-  executed_at: string | null
+  revealed_at: string | null
 }
 
 export function useMyEvent() {
@@ -89,7 +89,7 @@ export function useMyEvent() {
 
       const { data: revealData } = await supabase
         .from('reveals')
-        .select('id, reveal_type, scheduled_at, executed_at')
+        .select('id, reveal_type, scheduled_at, revealed_at')
         .eq('event_id', eventData.id)
         .order('scheduled_at', { ascending: true })
 
@@ -126,7 +126,7 @@ export function useMyEvent() {
     }
   }
 
-  const nextReveal = reveals.find(r => !r.executed_at)
+  const nextReveal = reveals.find(r => !r.revealed_at)
 
   return { event, duo, reveals, hostedCourse, nextReveal, loading, error, refresh: loadData }
 }

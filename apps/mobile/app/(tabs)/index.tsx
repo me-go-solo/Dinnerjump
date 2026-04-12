@@ -106,7 +106,7 @@ export default function HomeScreen() {
   // Fetch tablemates for course 1 when names are revealed
   useEffect(() => {
     if (!event || !duo) return
-    const namesReveal = reveals.find(r => r.reveal_type === 'names_course_1' && r.executed_at)
+    const namesReveal = reveals.find(r => r.reveal_type === 'names_course_1' && r.revealed_at)
     if (!namesReveal) return
 
     loadTablemates()
@@ -117,7 +117,7 @@ export default function HomeScreen() {
     if (!event || !reveals.length) return
 
     const dessertRevealed = reveals.some(
-      (r) => r.reveal_type === 'course_3_full' && r.executed_at
+      (r) => r.reveal_type === 'course_3_full' && r.revealed_at
     )
     if (dessertRevealed && event?.id) {
       scheduleDessertPhotoReminder(event.id)
@@ -222,7 +222,7 @@ export default function HomeScreen() {
     )
   }
 
-  const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.executed_at)
+  const isRevealed = (type: string) => reveals.some(r => r.reveal_type === type && r.revealed_at)
 
   // Determine disclosure level for tablemates
   const getDisclosureLevel = (): 'hidden' | 'initial' | 'full' => {
@@ -316,7 +316,7 @@ export default function HomeScreen() {
           title="Je tafelgenoten (voorgerecht)"
           emoji="👥"
           isRevealed={isRevealed('initials') || isRevealed('names_course_1')}
-          scheduledAt={reveals.find(r => r.reveal_type === 'initials' && !r.executed_at)?.scheduled_at}
+          scheduledAt={reveals.find(r => r.reveal_type === 'initials' && !r.revealed_at)?.scheduled_at}
         >
           {tablemates.length > 0 ? (
             tablemates.map((mate, i) => (

@@ -85,38 +85,55 @@ export async function generateMatch(eventId: string) {
     .limit(1)
   const nextVersion = (existing?.[0]?.version ?? 0) + 1
 
-  // Deactivate previous
-  await admin.from('matches').update({ is_active: false }).eq('event_id', eventId).eq('is_active', true)
-
-  // Insert match
+  // Insert new match first (inactive), then swap atomically
   const { data: match, error: matchError } = await admin.from('matches').insert({
-    event_id: eventId, version: nextVersion, is_active: true,
+    event_id: eventId, version: nextVersion, is_active: false,
   }).select('id').single()
 
   if (matchError || !match) return { error: 'Failed to save match' }
 
   // Insert assignments
-  await admin.from('match_assignments').insert(
+  const { error: assignError } = await admin.from('match_assignments').insert(
     duosForMatching.map(d => ({
       match_id: match.id, duo_id: d.id,
       hosted_course: result.assignments.get(d.id)! as CourseType,
       duo_display_name: d.displayName,
     }))
   )
+  if (assignError) {
+    await admin.from('matches').delete().eq('id', match.id)
+    return { error: 'Failed to save assignments' }
+  }
 
   // Insert tables + guests
   for (const table of result.tables) {
-    const { data: tableRow } = await admin.from('match_tables').insert({
+    const { data: tableRow, error: tableError } = await admin.from('match_tables').insert({
       match_id: match.id, course: table.course,
       table_number: table.tableNumber, host_duo_id: table.hostDuoId,
     }).select('id').single()
 
-    if (tableRow) {
-      await admin.from('match_table_guests').insert(
-        table.guestDuoIds.map(guestId => ({ match_table_id: tableRow.id, duo_id: guestId }))
-      )
+    if (tableError || !tableRow) {
+      await admin.from('match_tables').delete().eq('match_id', match.id)
+      await admin.from('match_assignments').delete().eq('match_id', match.id)
+      await admin.from('matches').delete().eq('id', match.id)
+      return { error: 'Failed to save tables' }
+    }
+
+    const { error: guestError } = await admin.from('match_table_guests').insert(
+      table.guestDuoIds.map(guestId => ({ match_table_id: tableRow.id, duo_id: guestId }))
+    )
+    if (guestError) {
+      await admin.from('match_table_guests').delete().eq('match_table_id', tableRow.id)
+      await admin.from('match_tables').delete().eq('match_id', match.id)
+      await admin.from('match_assignments').delete().eq('match_id', match.id)
+      await admin.from('matches').delete().eq('id', match.id)
+      return { error: 'Failed to save guests' }
     }
   }
+
+  // Only now activate: deactivate old, activate new
+  await admin.from('matches').update({ is_active: false }).eq('event_id', eventId).eq('is_active', true)
+  await admin.from('matches').update({ is_active: true }).eq('id', match.id)
 
   return { matchId: match.id, version: nextVersion }
 }
@@ -223,11 +240,10 @@ export async function saveMatchOverride(
 
   const nextVersion = currentMatch.version + 1
 
-  await admin.from('matches').update({ is_active: false }).eq('id', currentMatch.id)
-
+  // Insert new match as inactive first
   const { data: newMatch, error: matchError } = await admin
     .from('matches')
-    .insert({ event_id: eventId, version: nextVersion, is_active: true })
+    .insert({ event_id: eventId, version: nextVersion, is_active: false })
     .select('id')
     .single()
 
@@ -245,7 +261,7 @@ export async function saveMatchOverride(
   const nameMap = new Map((profiles ?? []).map(p => [p.id, p.display_name ?? 'Onbekend']))
   const duoNameMap = new Map((duos ?? []).map(d => [d.id, nameMap.get(d.person1_id) ?? 'Onbekend']))
 
-  await admin.from('match_assignments').insert(
+  const { error: assignError } = await admin.from('match_assignments').insert(
     allDuoIds.map(duoId => ({
       match_id: newMatch.id,
       duo_id: duoId,
@@ -254,8 +270,13 @@ export async function saveMatchOverride(
     }))
   )
 
+  if (assignError) {
+    await admin.from('matches').delete().eq('id', newMatch.id)
+    return { error: 'Failed to save assignments' }
+  }
+
   for (const table of tables) {
-    const { data: tableRow } = await admin
+    const { data: tableRow, error: tableError } = await admin
       .from('match_tables')
       .insert({
         match_id: newMatch.id,
@@ -266,12 +287,29 @@ export async function saveMatchOverride(
       .select('id')
       .single()
 
-    if (tableRow) {
-      await admin.from('match_table_guests').insert(
-        table.guests.map(g => ({ match_table_id: tableRow.id, duo_id: g.duoId }))
-      )
+    if (tableError || !tableRow) {
+      await admin.from('match_tables').delete().eq('match_id', newMatch.id)
+      await admin.from('match_assignments').delete().eq('match_id', newMatch.id)
+      await admin.from('matches').delete().eq('id', newMatch.id)
+      return { error: 'Failed to save tables' }
+    }
+
+    const { error: guestError } = await admin.from('match_table_guests').insert(
+      table.guests.map(g => ({ match_table_id: tableRow.id, duo_id: g.duoId }))
+    )
+
+    if (guestError) {
+      await admin.from('match_table_guests').delete().eq('match_table_id', tableRow.id)
+      await admin.from('match_tables').delete().eq('match_id', newMatch.id)
+      await admin.from('match_assignments').delete().eq('match_id', newMatch.id)
+      await admin.from('matches').delete().eq('id', newMatch.id)
+      return { error: 'Failed to save guests' }
     }
   }
+
+  // Only swap active status after everything is persisted
+  await admin.from('matches').update({ is_active: false }).eq('id', currentMatch.id)
+  await admin.from('matches').update({ is_active: true }).eq('id', newMatch.id)
 
   return { success: true, version: nextVersion }
 }

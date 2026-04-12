@@ -46,6 +46,9 @@ function getTimezoneOffsetMinutes(timezone: string, date: Date): number {
 
 /**
  * Convert a local date+time in a given timezone to a UTC ISO string.
+ * Handles DST transitions:
+ * - Spring forward (nonexistent time): shifts to the next valid time
+ * - Fall back (ambiguous time): picks the first occurrence (summer time)
  */
 function localToUtc(
   year: number,
@@ -61,13 +64,25 @@ function localToUtc(
 
   // Subtract offset to get the actual UTC time
   const utcMs = Date.UTC(year, month - 1, day, hour, minute) - offset * 60000
-
-  // Verify with the actual offset at the corrected time (handles DST edge cases)
   const corrected = new Date(utcMs)
   const offset2 = getTimezoneOffsetMinutes(timezone, corrected)
+
   if (offset2 !== offset) {
+    // DST transition detected — recalculate with the corrected offset
     const utcMs2 = Date.UTC(year, month - 1, day, hour, minute) - offset2 * 60000
-    return new Date(utcMs2).toISOString()
+    const corrected2 = new Date(utcMs2)
+    const offset3 = getTimezoneOffsetMinutes(timezone, corrected2)
+
+    if (offset3 !== offset2) {
+      // Nonexistent time (spring forward): the requested local time doesn't exist.
+      // Use the later offset (after the clock jumps forward) to land on the
+      // first valid instant after the gap.
+      const laterOffset = Math.min(offset, offset2)
+      const utcFinal = Date.UTC(year, month - 1, day, hour, minute) - laterOffset * 60000
+      return new Date(utcFinal).toISOString()
+    }
+
+    return corrected2.toISOString()
   }
 
   return corrected.toISOString()

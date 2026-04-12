@@ -8,8 +8,15 @@ export async function POST(request: NextRequest) {
   const { duoId, eventSlug, locale } = await request.json()
   const supabase = await createClient()
 
-  const { data: duo } = await supabase.from('duos').select('id, event_id').eq('id', duoId).eq('status', 'pending_payment').single()
+  // Auth check
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { data: duo } = await supabase.from('duos').select('id, event_id, person1_id').eq('id', duoId).eq('status', 'pending_payment').single()
   if (!duo) return NextResponse.json({ error: 'Duo not found' }, { status: 404 })
+
+  // Verify the user owns this duo
+  if (duo.person1_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data: event } = await supabase.from('events').select('title').eq('id', duo.event_id).single()
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL!
