@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Copy, Check, Send } from 'lucide-react'
+import { btn, input } from '@/lib/design'
 
 type Props = {
   eventId: string
@@ -26,8 +27,6 @@ export function InvitationsBlock({ eventId, eventSlug, appUrl }: Props) {
 
   function handleSendInvite() {
     // TODO: Wire up to a proper organizer invite action.
-    // The existing sendInvitation requires a duoId which the organizer may not have.
-    // For now this is a placeholder UI.
     console.log('Send invite to', inviteName, inviteEmail, 'for event', eventId)
     setInviteName('')
     setInviteEmail('')
@@ -44,28 +43,23 @@ export function InvitationsBlock({ eventId, eventSlug, appUrl }: Props) {
   }
 
   async function handleInstagram() {
-    // Instagram doesn't support direct sharing via URL — just copy the link
     await handleCopy()
   }
 
   async function handleQrCode() {
-    // TODO: Generate QR code with `qrcode` package. For now, just copy the link.
     await handleCopy()
   }
 
   return (
-    <div className="border-b py-5">
-      <h2 className="mb-3 text-sm font-semibold text-gray-700">{t('invitations')}</h2>
+    <div className="border-b border-gray-100 py-6">
+      <h2 className="mb-4 text-sm font-semibold text-gray-700">{t('invitations')}</h2>
 
       {/* Event link + copy */}
       <div className="flex items-center gap-2">
-        <span className="truncate rounded bg-gray-50 px-3 py-1.5 text-sm text-gray-600">
+        <span className="truncate rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-500 font-mono">
           {eventLink}
         </span>
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center gap-1 rounded border px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
-        >
+        <button onClick={handleCopy} className={btn.small}>
           {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
           {copied ? t('copied') : t('copyLink')}
         </button>
@@ -79,7 +73,7 @@ export function InvitationsBlock({ eventId, eventSlug, appUrl }: Props) {
             type="text"
             value={inviteName}
             onChange={(e) => setInviteName(e.target.value)}
-            className="w-full rounded border px-3 py-1.5 text-sm"
+            className={input.small}
           />
         </div>
         <div className="flex-1">
@@ -88,48 +82,31 @@ export function InvitationsBlock({ eventId, eventSlug, appUrl }: Props) {
             type="email"
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
-            className="w-full rounded border px-3 py-1.5 text-sm"
+            className={input.small}
           />
         </div>
         <button
           onClick={handleSendInvite}
           disabled={!inviteName || !inviteEmail}
-          className="inline-flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className={btn.save}
         >
-          <Send size={14} />
+          <Send size={14} className="mr-1" />
           {t('sendInvite')}
         </button>
       </div>
 
-      {/* Share buttons */}
+      {/* Share buttons — minimal, monochrome for premium feel */}
       <div className="mt-4 flex gap-2">
-        <button
-          onClick={handleWhatsApp}
-          className="rounded px-3 py-1.5 text-sm font-medium text-white"
-          style={{ backgroundColor: '#25D366' }}
-        >
+        <button onClick={handleWhatsApp} className={btn.small}>
           WhatsApp
         </button>
-        <button
-          onClick={handleFacebook}
-          className="rounded px-3 py-1.5 text-sm font-medium text-white"
-          style={{ backgroundColor: '#1877F2' }}
-        >
+        <button onClick={handleFacebook} className={btn.small}>
           Facebook
         </button>
-        <button
-          onClick={handleInstagram}
-          className="rounded px-3 py-1.5 text-sm font-medium text-white"
-          style={{
-            background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
-          }}
-        >
+        <button onClick={handleInstagram} className={btn.small}>
           Instagram
         </button>
-        <button
-          onClick={handleQrCode}
-          className="rounded border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
+        <button onClick={handleQrCode} className={btn.small}>
           {t('qrCode')}
         </button>
       </div>

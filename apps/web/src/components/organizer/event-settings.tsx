@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { updateEventSettings } from '@/actions/organizer'
 import { formatDuration } from '@/lib/format'
+import { btn, input, card, feedback } from '@/lib/design'
 
 type Props = {
   eventId: string
@@ -42,7 +43,6 @@ export function EventSettings({
 
   function startEditing(field: EditingField) {
     if (isLocked) return
-    // Reset values when starting edit
     setEditAfterparty(afterpartyAddress ?? '')
     setEditPolicy(invitationPolicy)
     setEditAppetizer(appetizerDuration)
@@ -85,24 +85,24 @@ export function EventSettings({
       : t('policyParticipantsAllowed')
 
   return (
-    <div className="py-5">
+    <div className="py-6">
       <h2 className="mb-1 text-sm font-semibold text-gray-700">{t('settings')}</h2>
-      <p className="mb-3 text-xs text-gray-400">{t('settingsHint')}</p>
+      <p className="mb-4 text-xs text-gray-400">{t('settingsHint')}</p>
 
       {isLocked && (
-        <div className="mb-3 rounded border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-700">
+        <div className={`mb-4 ${feedback.warning}`}>
           {t('settingsLocked')}
         </div>
       )}
 
       <div className="space-y-3">
         {/* Afterparty address */}
-        <div className="rounded border p-3">
+        <div className={card.base}>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-700">{t('afterparty')}</p>
               {editing !== 'afterparty' && (
-                <p className="text-sm text-gray-500">
+                <p className="mt-0.5 text-sm text-gray-500">
                   {afterpartyAddress || t('notSet')}
                 </p>
               )}
@@ -110,32 +110,32 @@ export function EventSettings({
             {editing !== 'afterparty' && !isLocked && (
               <button
                 onClick={() => startEditing('afterparty')}
-                className="text-xs text-blue-600 hover:underline"
+                className={btn.ghost}
               >
                 {afterpartyAddress ? t('edit') : t('add')}
               </button>
             )}
           </div>
           {editing === 'afterparty' && (
-            <div className="mt-2">
+            <div className="mt-3">
               <input
                 type="text"
                 value={editAfterparty}
                 onChange={(e) => setEditAfterparty(e.target.value)}
-                className="w-full rounded border px-3 py-1.5 text-sm"
+                className={input.small}
                 placeholder={t('afterparty')}
               />
-              <div className="mt-2 flex gap-2">
+              <div className="mt-3 flex gap-2">
                 <button
                   onClick={() => save('afterparty')}
                   disabled={isPending}
-                  className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  className={btn.save}
                 >
                   {tc('save')}
                 </button>
                 <button
                   onClick={cancel}
-                  className="rounded border px-3 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                  className={btn.small}
                 >
                   {tc('cancel')}
                 </button>
@@ -145,54 +145,56 @@ export function EventSettings({
         </div>
 
         {/* Invitation policy */}
-        <div className="rounded border p-3">
+        <div className={card.base}>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-700">{t('invitationPolicy')}</p>
               {editing !== 'policy' && (
-                <p className="text-sm text-gray-500">{policyLabel}</p>
+                <p className="mt-0.5 text-sm text-gray-500">{policyLabel}</p>
               )}
             </div>
             {editing !== 'policy' && !isLocked && (
               <button
                 onClick={() => startEditing('policy')}
-                className="text-xs text-blue-600 hover:underline"
+                className={btn.ghost}
               >
                 {t('edit')}
               </button>
             )}
           </div>
           {editing === 'policy' && (
-            <div className="mt-2 space-y-1">
-              <label className="flex items-center gap-2 text-sm">
+            <div className="mt-3 space-y-2">
+              <label className="flex items-center gap-2.5 text-sm cursor-pointer">
                 <input
                   type="radio"
                   name="policy"
                   checked={editPolicy === 'organizer_only'}
                   onChange={() => setEditPolicy('organizer_only')}
+                  className="accent-black"
                 />
                 {t('policyOrganizerOnly')}
               </label>
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2.5 text-sm cursor-pointer">
                 <input
                   type="radio"
                   name="policy"
                   checked={editPolicy === 'participants_allowed'}
                   onChange={() => setEditPolicy('participants_allowed')}
+                  className="accent-black"
                 />
                 {t('policyParticipantsAllowed')}
               </label>
-              <div className="mt-2 flex gap-2">
+              <div className="mt-3 flex gap-2">
                 <button
                   onClick={() => save('policy')}
                   disabled={isPending}
-                  className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  className={btn.save}
                 >
                   {tc('save')}
                 </button>
                 <button
                   onClick={cancel}
-                  className="rounded border px-3 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                  className={btn.small}
                 >
                   {tc('cancel')}
                 </button>
@@ -202,12 +204,12 @@ export function EventSettings({
         </div>
 
         {/* Course durations */}
-        <div className="rounded border p-3">
+        <div className={card.base}>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-700">{t('courseDurations')}</p>
               {editing !== 'durations' && (
-                <p className="text-sm text-gray-500">
+                <p className="mt-0.5 text-sm text-gray-500">
                   {t('durationFormat', {
                     appetizer: formatDuration(appetizerDuration),
                     main: formatDuration(mainDuration),
@@ -219,14 +221,14 @@ export function EventSettings({
             {editing !== 'durations' && !isLocked && (
               <button
                 onClick={() => startEditing('durations')}
-                className="text-xs text-blue-600 hover:underline"
+                className={btn.ghost}
               >
                 {t('edit')}
               </button>
             )}
           </div>
           {editing === 'durations' && (
-            <div className="mt-2">
+            <div className="mt-3">
               <div className="flex gap-3">
                 <div>
                   <label className="mb-1 block text-xs text-gray-500">{t('appetizer')}</label>
@@ -234,7 +236,7 @@ export function EventSettings({
                     type="number"
                     value={editAppetizer}
                     onChange={(e) => setEditAppetizer(Number(e.target.value))}
-                    className="w-20 rounded border px-2 py-1 text-sm"
+                    className={`w-20 ${input.small}`}
                     min={10}
                     max={120}
                   />
@@ -245,7 +247,7 @@ export function EventSettings({
                     type="number"
                     value={editMain}
                     onChange={(e) => setEditMain(Number(e.target.value))}
-                    className="w-20 rounded border px-2 py-1 text-sm"
+                    className={`w-20 ${input.small}`}
                     min={10}
                     max={120}
                   />
@@ -256,23 +258,23 @@ export function EventSettings({
                     type="number"
                     value={editDessert}
                     onChange={(e) => setEditDessert(Number(e.target.value))}
-                    className="w-20 rounded border px-2 py-1 text-sm"
+                    className={`w-20 ${input.small}`}
                     min={10}
                     max={120}
                   />
                 </div>
               </div>
-              <div className="mt-2 flex gap-2">
+              <div className="mt-3 flex gap-2">
                 <button
                   onClick={() => save('durations')}
                   disabled={isPending}
-                  className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  className={btn.save}
                 >
                   {tc('save')}
                 </button>
                 <button
                   onClick={cancel}
-                  className="rounded border px-3 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                  className={btn.small}
                 >
                   {tc('cancel')}
                 </button>

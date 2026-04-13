@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { X } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
+import { card, btn } from '@/lib/design'
 
 const DISMISS_KEY = 'dj_welcome_dismissed'
 
@@ -25,22 +26,19 @@ export function WelcomeCard({ displayName }: { displayName: string }) {
   }
 
   return (
-    <div className="relative mb-8 rounded-lg border-2 border-black p-6">
+    <div className={`relative mb-8 ${card.accent}`}>
       <button
         onClick={dismiss}
-        className="absolute right-3 top-3 text-gray-400 hover:text-black"
+        className="absolute right-4 top-4 text-gray-400 hover:text-black"
         aria-label="Sluiten"
       >
-        <X className="h-5 w-5" />
+        <X className="h-4 w-4" />
       </button>
-      <h2 className="mb-2 text-xl font-bold">
+      <h2 className="mb-2 text-xl font-semibold tracking-tight">
         {t('welcomeTitle', { name: displayName })}
       </h2>
-      <p className="mb-4 text-gray-600">{t('welcomeDescription')}</p>
-      <Link
-        href="/events/create"
-        className="inline-block rounded bg-black px-6 py-3 text-white hover:bg-gray-800"
-      >
+      <p className="mb-5 text-sm text-gray-500 leading-relaxed">{t('welcomeDescription')}</p>
+      <Link href="/events/create" className={btn.primary}>
         {t('welcomeCta')}
       </Link>
     </div>

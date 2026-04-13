@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Users } from 'lucide-react'
+import { STATUS_COLORS, statusToKey, btn, badge } from '@/lib/design'
 import type { Event } from '@/lib/types'
 
 type EventWithCounts = Event & {
@@ -15,26 +16,6 @@ type Props = {
   events: EventWithCounts[]
 }
 
-const statusColors: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-700',
-  registration_open: 'bg-green-100 text-green-700',
-  confirmed: 'bg-blue-100 text-blue-700',
-  closed: 'bg-yellow-100 text-yellow-700',
-  active: 'bg-green-100 text-green-700',
-  completed: 'bg-gray-100 text-gray-600',
-  cancelled: 'bg-red-100 text-red-700',
-}
-
-function statusToKey(status: string): string {
-  return (
-    'status' +
-    status
-      .split('_')
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join('')
-  )
-}
-
 export function EventsOverview({ displayName, events }: Props) {
   const t = useTranslations('organizer')
 
@@ -43,15 +24,12 @@ export function EventsOverview({ displayName, events }: Props) {
 
   return (
     <div>
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-8 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('greeting', { name: displayName })}</h1>
-          <p className="text-gray-500">{t('subtitle')}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('greeting', { name: displayName })}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('subtitle')}</p>
         </div>
-        <Link
-          href="/events/create"
-          className="rounded bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-        >
+        <Link href="/events/create" className={btn.primary}>
           {t('newEvent')}
         </Link>
       </div>
@@ -61,26 +39,26 @@ export function EventsOverview({ displayName, events }: Props) {
           <Link
             key={event.id}
             href={`/organizer/${event.slug}`}
-            className="block rounded-lg border-2 border-black p-4 transition-colors hover:bg-gray-50"
+            className="block rounded-xl border-2 border-black p-5 transition-all hover:bg-gray-50 hover:shadow-sm"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold">{event.title}</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="font-semibold tracking-tight">{event.title}</h3>
+                <p className="mt-1 text-sm text-gray-500">
                   {new Date(event.event_date).toLocaleDateString()} — {event.start_time?.slice(0, 5)}
                 </p>
               </div>
-              <span className={`rounded px-2 py-1 text-xs font-medium ${statusColors[event.status] ?? 'bg-gray-100 text-gray-600'}`}>
+              <span className={`${badge.base} ${STATUS_COLORS[event.status] ?? 'bg-gray-100 text-gray-600'}`}>
                 {t(statusToKey(event.status))}
               </span>
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <div className="flex items-center gap-1 text-sm text-gray-600">
+              <div className="flex items-center gap-1.5 text-sm text-gray-500">
                 <Users size={14} />
                 <span>{t('duosCount', { count: event.total_count })}</span>
               </div>
               {event.registration_deadline && (
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-400">
                   {t('deadline', {
                     date: new Date(event.registration_deadline).toLocaleDateString(),
                   })}
@@ -94,16 +72,16 @@ export function EventsOverview({ displayName, events }: Props) {
           <Link
             key={event.id}
             href={`/organizer/${event.slug}`}
-            className="block rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+            className="block rounded-xl border border-gray-200 p-5 transition-all hover:bg-gray-50 hover:shadow-sm"
           >
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-semibold text-gray-400">{event.title}</h3>
-                <p className="text-sm text-gray-400">
+                <p className="mt-1 text-sm text-gray-400">
                   {new Date(event.event_date).toLocaleDateString()} — {event.start_time?.slice(0, 5)}
                 </p>
               </div>
-              <span className={`rounded px-2 py-1 text-xs font-medium ${statusColors[event.status] ?? 'bg-gray-100 text-gray-600'}`}>
+              <span className={`${badge.base} ${STATUS_COLORS[event.status] ?? 'bg-gray-100 text-gray-600'}`}>
                 {t(statusToKey(event.status))}
               </span>
             </div>

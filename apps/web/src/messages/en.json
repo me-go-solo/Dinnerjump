@@ -10,7 +10,10 @@
     "back": "Back",
     "submit": "Submit",
     "loading": "Loading...",
-    "error": "Something went wrong"
+    "error": "Something went wrong",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password"
   },
   "nav": {
     "home": "Home",
@@ -87,6 +90,7 @@
     "city": "City",
     "postalCode": "Postal code",
     "country": "Country",
+    "addressNotFound": "Address not found",
     "outsideRadius": "Your address is outside this event's zone.",
     "pay": "Pay €10 and sign up",
     "confirmed": "Your spot is confirmed!",
@@ -212,6 +216,16 @@
     "main": "Main course",
     "dessert": "Dessert",
     "noMessages": "No messages sent yet",
-    "statusRegistrationOpen": "Registration open"
+    "statusRegistrationOpen": "Registration open",
+    "matchVersion": "Layout v{version}",
+    "undo": "Undo",
+    "redo": "Redo",
+    "mix": "Mix",
+    "bike": "Bike",
+    "car": "Car",
+    "avgTime": "avg. {minutes} min",
+    "validationWarnings": "Validation warnings",
+    "saving": "Saving...",
+    "sentToCount": "Sent to {count} participants"
   }
 }

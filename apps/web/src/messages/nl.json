@@ -10,7 +10,10 @@
     "back": "Terug",
     "submit": "Versturen",
     "loading": "Laden...",
-    "error": "Er is iets misgegaan"
+    "error": "Er is iets misgegaan",
+    "name": "Naam",
+    "email": "E-mail",
+    "password": "Wachtwoord"
   },
   "nav": {
     "home": "Home",
@@ -87,6 +90,7 @@
     "city": "Stad",
     "postalCode": "Postcode",
     "country": "Land",
+    "addressNotFound": "Adres niet gevonden",
     "outsideRadius": "Je adres valt buiten de zone van dit event.",
     "pay": "Betaal €10 en schrijf in",
     "confirmed": "Je plek is bevestigd!",
@@ -212,6 +216,16 @@
     "main": "Hoofdgerecht",
     "dessert": "Dessert",
     "noMessages": "Nog geen berichten verstuurd",
-    "statusRegistrationOpen": "Registratie open"
+    "statusRegistrationOpen": "Registratie open",
+    "matchVersion": "Indeling v{version}",
+    "undo": "Ongedaan maken",
+    "redo": "Opnieuw",
+    "mix": "Mix",
+    "bike": "Fiets",
+    "car": "Auto",
+    "avgTime": "gem. {minutes} min",
+    "validationWarnings": "Validatie-waarschuwingen",
+    "saving": "Opslaan...",
+    "sentToCount": "Verstuurd naar {count} deelnemers"
   }
 }

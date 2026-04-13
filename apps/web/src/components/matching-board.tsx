@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
+import { AlertTriangle, Save, Undo2, Redo2, Shuffle, Bike, Car } from 'lucide-react'
 import { mixMatch, setActiveMatchVersion, saveMatchOverride } from '@/actions/matching'
 import { validateTableData } from '@/lib/matching'
+import { COURSE_COLORS, btn, feedback } from '@/lib/design'
 import type { CourseType } from '@/lib/types'
 
 type TableData = {
@@ -30,22 +33,12 @@ type Props = {
   versions: MatchVersion[]
 }
 
-const COURSE_LABELS: Record<CourseType, string> = {
-  appetizer: 'Voorgerecht',
-  main: 'Hoofdgerecht',
-  dessert: 'Dessert',
-}
-
-const COURSE_COLORS: Record<CourseType, { border: string; bg: string; header: string }> = {
-  appetizer: { border: 'border-orange-300', bg: 'bg-orange-50', header: 'bg-orange-100 text-orange-800' },
-  main: { border: 'border-red-300', bg: 'bg-red-50', header: 'bg-red-100 text-red-800' },
-  dessert: { border: 'border-purple-300', bg: 'bg-purple-50', header: 'bg-purple-100 text-purple-800' },
-}
-
 const COURSES: CourseType[] = ['appetizer', 'main', 'dessert']
 
 export function MatchingBoard({ eventId, versions }: Props) {
   const router = useRouter()
+  const t = useTranslations('organizer')
+  const tc = useTranslations('common')
   const [isPending, startTransition] = useTransition()
   const [transportMode, setTransportMode] = useState<'bike' | 'car'>('bike')
   const [isDirty, setIsDirty] = useState(false)
@@ -158,54 +151,63 @@ export function MatchingBoard({ eventId, versions }: Props) {
     setValidationErrors(result.errors)
   }
 
+  const courseLabel = (course: CourseType) => t(course)
+
   return (
     <div className="mt-8">
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h2 className="text-lg font-semibold">Indeling v{activeVersion.version}</h2>
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <h2 className="text-lg font-semibold tracking-tight">
+          {t('matchVersion', { version: activeVersion.version })}
+        </h2>
 
         <div className="flex gap-1">
           <button
             onClick={handleUndo}
             disabled={!canUndo || isPending}
-            className="rounded border px-2 py-1 text-sm disabled:opacity-40"
+            className={btn.small}
+            aria-label={t('undo')}
           >
-            Undo
+            <Undo2 size={14} />
           </button>
           <button
             onClick={handleRedo}
             disabled={!canRedo || isPending}
-            className="rounded border px-2 py-1 text-sm disabled:opacity-40"
+            className={btn.small}
+            aria-label={t('redo')}
           >
-            Redo
+            <Redo2 size={14} />
           </button>
         </div>
 
         <button
           onClick={handleMix}
           disabled={isPending}
-          className="rounded bg-gray-800 px-3 py-1 text-sm text-white disabled:opacity-50"
+          className={btn.primary}
         >
-          {isPending ? 'Bezig...' : 'Mix'}
+          <Shuffle size={14} className="mr-1.5" />
+          {isPending ? tc('loading') : t('mix')}
         </button>
 
-        <div className="ml-auto flex items-center gap-2">
-          <div className="flex rounded border text-sm">
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex rounded-lg border border-gray-200 text-sm">
             <button
               onClick={() => setTransportMode('bike')}
-              className={`px-2 py-1 ${transportMode === 'bike' ? 'bg-gray-800 text-white' : ''}`}
+              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-l-lg text-xs font-medium ${transportMode === 'bike' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50'}`}
             >
-              Fiets
+              <Bike size={14} />
+              {t('bike')}
             </button>
             <button
               onClick={() => setTransportMode('car')}
-              className={`px-2 py-1 ${transportMode === 'car' ? 'bg-gray-800 text-white' : ''}`}
+              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-r-lg text-xs font-medium ${transportMode === 'car' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50'}`}
             >
-              Auto
+              <Car size={14} />
+              {t('car')}
             </button>
           </div>
           {avgTime != null && (
-            <span className="text-sm text-gray-600">
-              gem. {Math.round(avgTime)} min
+            <span className="text-sm text-gray-500 tabular-nums">
+              {t('avgTime', { minutes: Math.round(avgTime) })}
             </span>
           )}
         </div>
@@ -220,15 +222,15 @@ export function MatchingBoard({ eventId, versions }: Props) {
 
           return (
             <div key={course}>
-              <h3 className={`mb-2 rounded px-3 py-1.5 text-sm font-semibold ${colors.header}`}>
-                {COURSE_LABELS[course]}
+              <h3 className={`mb-2 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide ${colors.header}`}>
+                {courseLabel(course)}
               </h3>
               <div className="flex flex-col gap-2">
                 {courseTables.map(table => (
-                  <div key={table.id} className={`rounded border ${colors.border} ${colors.bg} p-3`}>
-                    <div className="mb-1">
-                      <span className="text-sm font-bold">{table.hostName}</span>
-                      <span className="ml-1 text-xs text-gray-500">{table.hostCity}</span>
+                  <div key={table.id} className={`rounded-lg border ${colors.border} ${colors.bg} p-3`}>
+                    <div className="mb-1.5">
+                      <span className="text-sm font-semibold">{table.hostName}</span>
+                      <span className="ml-1.5 text-xs text-gray-400">{table.hostCity}</span>
                     </div>
                     {table.guests.map((guest, idx) => (
                       <div
@@ -237,10 +239,10 @@ export function MatchingBoard({ eventId, versions }: Props) {
                         onDragStart={() => handleDragStart(table.id, idx)}
                         onDragOver={e => e.preventDefault()}
                         onDrop={() => handleDrop(table.id, idx)}
-                        className="cursor-grab rounded px-1 py-0.5 text-sm hover:bg-white/50"
+                        className="cursor-grab rounded-md px-1.5 py-1 text-sm hover:bg-white/60"
                       >
                         {guest.name}
-                        <span className="ml-1 text-xs text-gray-400">{guest.city}</span>
+                        <span className="ml-1.5 text-xs text-gray-400">{guest.city}</span>
                       </div>
                     ))}
                   </div>
@@ -252,9 +254,12 @@ export function MatchingBoard({ eventId, versions }: Props) {
       </div>
 
       {validationErrors.length > 0 && (
-        <div className="mt-4 rounded border border-yellow-300 bg-yellow-50 p-4">
-          <p className="mb-2 text-sm font-semibold text-yellow-800">⚠️ Validatie-waarschuwingen</p>
-          <ul className="list-inside list-disc text-sm text-yellow-700">
+        <div className={`mt-4 ${feedback.warning}`}>
+          <p className="mb-2 flex items-center gap-1.5 font-semibold">
+            <AlertTriangle size={14} />
+            {t('validationWarnings')}
+          </p>
+          <ul className="list-inside list-disc text-sm">
             {validationErrors.map((err, i) => (
               <li key={i}>{err}</li>
             ))}
@@ -263,7 +268,7 @@ export function MatchingBoard({ eventId, versions }: Props) {
       )}
 
       {saveError && (
-        <div className="mt-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+        <div className={`mt-4 ${feedback.error}`}>
           {saveError}
         </div>
       )}
@@ -272,9 +277,10 @@ export function MatchingBoard({ eventId, versions }: Props) {
         <button
           onClick={handleSave}
           disabled={validationErrors.length > 0 || isPending}
-          className="mt-4 rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`mt-4 ${btn.primary}`}
         >
-          {isPending ? 'Opslaan...' : '💾 Wijzigingen opslaan'}
+          <Save size={14} className="mr-1.5" />
+          {isPending ? tc('loading') : tc('save')}
         </button>
       )}
     </div>
